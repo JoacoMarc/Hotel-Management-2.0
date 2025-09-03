@@ -39,4 +39,8 @@ public class Employee {
     @ManyToOne(optional = false)
     @JoinColumn(name = "hotel_id", nullable = false)
     private Hotel hotel;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private EmployeeRole role;
 }

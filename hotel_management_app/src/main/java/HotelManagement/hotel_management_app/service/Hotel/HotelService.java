@@ -12,8 +12,6 @@ public interface HotelService {
     Hotel createHotel(Hotel hotel);
     Hotel updateHotel(UUID id, Hotel hotel);
     void deleteHotel(UUID id);
-    List<Room> getRoomsByCountry(String country);
-    List<Room> getRoomsByCity(String city);
-    List<Room> getRoomsByState(String state);
-    List<Room> getRoomsByHotelType(String hotelType);
+    // Método de búsqueda de hoteles con múltiples filtros opcionales
+    List<Hotel> searchHotels(String country, String city, String state, String type, String name, Integer minRating, Integer maxRating, String zipCode, String phone, String email);
 }

@@ -10,6 +10,7 @@ import HotelManagement.hotel_management_app.entity.Room;
 import HotelManagement.hotel_management_app.entity.Hotel;
 import HotelManagement.hotel_management_app.repository.RoomRepository;
 import HotelManagement.hotel_management_app.repository.HotelRepository;
+import HotelManagement.hotel_management_app.repository.BookingRepository;
 import HotelManagement.hotel_management_app.exceptions.RoomNotFoundException;
 import HotelManagement.hotel_management_app.exceptions.RoomDuplicateException;
 import HotelManagement.hotel_management_app.exceptions.HotelNotFoundException;
@@ -21,6 +22,9 @@ public class RoomServiceImpl implements RoomService {
     
     @Autowired
     private HotelRepository hotelRepository;
+    
+    @Autowired
+    private BookingRepository bookingRepository;
 
     public List<Room> getAllRooms() {
         return roomRepository.findAll();
@@ -63,7 +67,13 @@ public class RoomServiceImpl implements RoomService {
     }
 
     public void deleteRoom(UUID id) {
-        roomRepository.findById(id).orElseThrow(() -> new RoomNotFoundException());
+        Room room = roomRepository.findById(id).orElseThrow(() -> new RoomNotFoundException());
+        
+        // Verificar si la habitación tiene reservas activas
+        if (bookingRepository.findBookingsWithRoom(id).size() > 0) {
+            throw new IllegalStateException("Cannot delete room. It has associated bookings. Cancel all bookings first.");
+        }
+        
         roomRepository.deleteById(id);
     }
 
@@ -72,23 +82,8 @@ public class RoomServiceImpl implements RoomService {
         return roomRepository.findByHotel(hotel);
     }
 
-    public List<Room> getRoomsByRoomType(String roomType) {
-        return roomRepository.findByRoomType(roomType);
-    }
-
-    public List<Room> getRoomsByRoomPrice(double roomPrice) {
-        return roomRepository.findByRoomPrice(roomPrice);
-    }
-
-    public List<Room> getRoomsByRoomCapacity(int roomCapacity) {
-        return roomRepository.findByRoomCapacity(roomCapacity);
-    }
-
-    public List<Room> getRoomsByRoomAvailability(boolean roomAvailability) {
-        return roomRepository.findByRoomAvailability(roomAvailability);
-    }
-
-    public List<Room> getRoomsByRoomNumber(String roomNumber) {
-        return roomRepository.findByRoomNumber(roomNumber);
+    @Override
+    public List<Room> searchRooms(String type, Double price, Integer capacity, Boolean available, String number, UUID hotelId, Double minPrice, Double maxPrice, String hotelName, String hotelCity, String hotelCountry) {
+        return roomRepository.searchRooms(type, price, capacity, available, number, hotelId, minPrice, maxPrice, hotelName, hotelCity, hotelCountry);
     }
 }

@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import HotelManagement.hotel_management_app.entity.Booking;
-import HotelManagement.hotel_management_app.entity.Guest;
 import HotelManagement.hotel_management_app.entity.dto.BookingRequest;
 import HotelManagement.hotel_management_app.service.Booking.BookingService;
 import java.time.LocalDate;
@@ -68,18 +67,23 @@ public class BookingController {
         return bookingService.getBookingsByRoomId(roomId);
     }
     
-    @GetMapping("/checkin")
-    public List<Booking> getBookingsByCheckInDate(@RequestParam String checkInDate) {
-        return bookingService.getBookingsByCheckInDate(LocalDate.parse(checkInDate));
-    }
-
-    @GetMapping("/checkout")
-    public List<Booking> getBookingsByCheckOutDate(@RequestParam String checkOutDate) {
-        return bookingService.getBookingsByCheckOutDate(LocalDate.parse(checkOutDate));
-    }
-    
-    @GetMapping("/status/{status}")
-    public List<Booking> getBookingsByStatus(@PathVariable String status) {
-        return bookingService.getBookingsByStatus(status);
+    // Búsqueda con filtros múltiples usando query parameters
+    @GetMapping("/search")
+    public List<Booking> searchBookings(
+            @RequestParam(required = false) String checkInDate,
+            @RequestParam(required = false) String checkOutDate,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) UUID hotelId,
+            @RequestParam(required = false) UUID guestId,
+            @RequestParam(required = false) UUID roomId,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) String guestSurname,
+            @RequestParam(required = false) String guestDocumentNumber,
+            @RequestParam(required = false) String guestName) {
+        LocalDate parsedCheckInDate = checkInDate != null ? LocalDate.parse(checkInDate) : null;
+        LocalDate parsedCheckOutDate = checkOutDate != null ? LocalDate.parse(checkOutDate) : null;
+        return bookingService.searchBookings(parsedCheckInDate, parsedCheckOutDate, status, hotelId, guestId, roomId, minPrice, maxPrice, guestSurname, 
+        guestName, guestDocumentNumber);
     }
 }

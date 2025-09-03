@@ -178,6 +178,8 @@ public class BookingServiceImpl implements BookingService {
         return bookingRepository.findByGuest(guest);
     }
     
+    
+
     public List<Booking> getBookingsByHotelId(UUID hotelId) {
         Hotel hotel = hotelRepository.findById(hotelId).orElseThrow(() -> new HotelNotFoundException());
         return bookingRepository.findByHotel(hotel);
@@ -187,21 +189,18 @@ public class BookingServiceImpl implements BookingService {
         return bookingRepository.findBookingsWithRoom(roomId);
     }
     
-    public List<Booking> getBookingsByCheckInDate(LocalDate checkInDate) {
-        return bookingRepository.findByCheckInDate(checkInDate);
-    }
-    
-    public List<Booking> getBookingsByCheckOutDate(LocalDate checkOutDate) {
-        return bookingRepository.findByCheckOutDate(checkOutDate);
-    }
-    
-    public List<Booking> getBookingsByStatus(String status) {
-        try {
-            BookingStatus bookingStatus = BookingStatus.valueOf(status.toUpperCase());
-            return bookingRepository.findByStatus(bookingStatus);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid booking status: " + status);
+    @Override
+    public List<Booking> searchBookings(LocalDate checkInDate, LocalDate checkOutDate, String status, UUID hotelId, UUID guestId, UUID roomId, Double minPrice,
+     Double maxPrice, String guestSurname, String guestName, String guestDocumentNumber) {
+        BookingStatus bookingStatus = null;
+        if (status != null) {
+            try {
+                bookingStatus = BookingStatus.valueOf(status.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid booking status: " + status);
+            }
         }
+        return bookingRepository.searchBookings(checkInDate, checkOutDate, bookingStatus, hotelId, guestId, roomId, minPrice, maxPrice, guestSurname, guestName, guestDocumentNumber);
     }
     
     // Métodos para obtener huéspedes por hotel

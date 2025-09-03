@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import HotelManagement.hotel_management_app.entity.Employee;
+import HotelManagement.hotel_management_app.entity.EmployeeRole;
 import HotelManagement.hotel_management_app.entity.Hotel;
 import HotelManagement.hotel_management_app.repository.EmployeeRepository;
 import HotelManagement.hotel_management_app.repository.HotelRepository;
@@ -62,6 +63,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         existingEmployee.setPhone(employee.getPhone());
         existingEmployee.setEmployeeCode(employee.getEmployeeCode());
         existingEmployee.setHireDate(employee.getHireDate());
+        existingEmployee.setRole(employee.getRole());
         
         // Actualizar hotel si se proporciona
         if (employee.getHotel() != null) {
@@ -107,23 +109,25 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeRepository.findByEmployeeCode(employeeCode);
     }
     
-    public List<Employee> getEmployeesByEmail(String email) {
-        return employeeRepository.findByEmail(email);
+    public List<Employee> getEmployeesByRole(String role) {
+        try {
+            EmployeeRole employeeRole = EmployeeRole.valueOf(role.toUpperCase());
+            return employeeRepository.findByRole(employeeRole);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid employee role: " + role);
+        }
     }
     
-    public List<Employee> getEmployeesByName(String name) {
-        return employeeRepository.findByName(name);
-    }
-
-    public List<Employee> getEmployeesBySurname(String surname) {
-        return employeeRepository.findBySurname(surname);
-    }
-
-    public List<Employee> getEmployeesByHireDate(LocalDate hireDate) {
-        return employeeRepository.findByHireDate(hireDate);
-    }
-    
-    public List<Employee> getEmployeesByNameAndSurname(String name, String surname) {
-        return employeeRepository.findByNameAndSurname(name, surname);
+    @Override
+    public List<Employee> searchEmployees(String name, String surname, String email, LocalDate hireDate, String role) {
+        EmployeeRole employeeRole = null;
+        if (role != null) {
+            try {
+                employeeRole = EmployeeRole.valueOf(role.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid employee role: " + role);
+            }
+        }
+        return employeeRepository.searchEmployees(name, surname, email, hireDate, employeeRole);
     }
 }

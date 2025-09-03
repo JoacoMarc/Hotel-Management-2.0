@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import HotelManagement.hotel_management_app.entity.Guest;
@@ -36,18 +37,7 @@ public class GuestController {
 
     @PostMapping
     public Guest createGuest(@RequestBody GuestRequest guestRequest) {
-        // Convertir GuestRequest a Guest
-        Guest guest = new Guest();
-        guest.setName(guestRequest.getName());
-        guest.setSurname(guestRequest.getSurname());
-        guest.setEmail(guestRequest.getEmail());
-        guest.setPhone(guestRequest.getPhone());
-        guest.setDocumentType(guestRequest.getDocumentType());
-        guest.setDocumentNumber(guestRequest.getDocumentNumber());
-        guest.setNationality(guestRequest.getNationality());
-        guest.setBirthDate(guestRequest.getBirthDate());
-        
-        return guestService.createGuest(guest);
+        return guestService.createGuest(guestRequest);
     }
 
     @PutMapping("/{guestId}")
@@ -61,29 +51,16 @@ public class GuestController {
         return ResponseEntity.noContent().build();
     }
 
-    // Búsquedas específicas con rutas claras
-    @GetMapping("/document/{documentNumber}")
-    public List<Guest> getGuestsByDocumentNumber(@PathVariable String documentNumber) {
-        return guestService.getGuestsByDocumentNumber(documentNumber);
-    }
-
-    @GetMapping("/surname/{surname}")
-    public List<Guest> getGuestsBySurname(@PathVariable String surname) {
-        return guestService.getGuestsBySurname(surname);
-    }
-
-    @GetMapping("/email/{email}")
-    public List<Guest> getGuestsByEmail(@PathVariable String email) {
-        return guestService.getGuestsByEmail(email);
-    }
-
-    @GetMapping("/name/{name}")
-    public List<Guest> getGuestsByName(@PathVariable String name) {
-        return guestService.getGuestsByName(name);
-    }
-
-    @GetMapping("/nationality/{nationality}")
-    public List<Guest> getGuestsByNationality(@PathVariable String nationality) {
-        return guestService.getGuestsByNationality(nationality);
+    // Búsqueda con filtros múltiples usando query parameters
+    @GetMapping("/search")
+    public List<Guest> searchGuests(
+            @RequestParam(required = false) String documentNumber,
+            @RequestParam(required = false) String surname, 
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String nationality,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String documentType,
+            @RequestParam(required = false) String phone) {
+        return guestService.searchGuests(documentNumber, surname, email, nationality, name, documentType, phone);
     }
 }

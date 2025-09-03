@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import HotelManagement.hotel_management_app.entity.Guest;
+import HotelManagement.hotel_management_app.entity.dto.GuestRequest;
 import HotelManagement.hotel_management_app.repository.GuestRepository;
 import HotelManagement.hotel_management_app.exceptions.GuestNotFoundException;
 import HotelManagement.hotel_management_app.exceptions.GuestDuplicateException;
@@ -25,11 +26,23 @@ public class GuestServiceImpl implements GuestService {
         return guestRepository.findById(id).orElseThrow(() -> new GuestNotFoundException());
     }
     
-    public Guest createGuest(Guest guest) throws GuestDuplicateException {
-        // Validar duplicado por número de documento
-        if (guest.getDocumentNumber() != null && !guest.getDocumentNumber().trim().isEmpty()) {
-            List<Guest> existingGuests = guestRepository.findByDocumentNumber(guest.getDocumentNumber());
-            if (!existingGuests.isEmpty()) {
+    @Override
+    public Guest createGuest(GuestRequest guestRequest) throws GuestDuplicateException {
+        // Convertir GuestRequest a Guest
+        Guest guest = new Guest();
+        guest.setName(guestRequest.getName());
+        guest.setSurname(guestRequest.getSurname());
+        guest.setEmail(guestRequest.getEmail());
+        guest.setPhone(guestRequest.getPhone());
+        guest.setDocumentType(guestRequest.getDocumentType());
+        guest.setDocumentNumber(guestRequest.getDocumentNumber());
+        guest.setNationality(guestRequest.getNationality());
+        guest.setBirthDate(guestRequest.getBirthDate());
+        
+        // Validar duplicado por número de documento y apellido
+        if (guest.getDocumentNumber() != null && !guest.getDocumentNumber().trim().isEmpty() && guest.getSurname() != null && !guest.getSurname().trim().isEmpty()) {
+            List<Guest> existingGuests = guestRepository.findByDocumentNumberAndSurname(guest.getDocumentNumber(), guest.getSurname());
+            if (!existingGuests.isEmpty()) {    
                 throw new GuestDuplicateException();
             }
         }
@@ -54,27 +67,8 @@ public class GuestServiceImpl implements GuestService {
         guestRepository.deleteById(id);
     }
 
-    public List<Guest> getGuestsByDocumentNumber(String documentNumber) {
-        return guestRepository.findByDocumentNumber(documentNumber);
-    }
-
-    public List<Guest> getGuestsBySurname(String surname) {
-        return guestRepository.findBySurname(surname);
-    }
-
-    public List<Guest> getGuestsByEmail(String email) {
-        return guestRepository.findByEmail(email);
-    }
-    
-    public List<Guest> getGuestsByName(String name) {
-        return guestRepository.findByName(name);
-    }
-    
-    public List<Guest> getGuestsByNationality(String nationality) {
-        return guestRepository.findByNationality(nationality);
-    }
-    
-    public List<Guest> getGuestsByNameAndSurname(String name, String surname) {
-        return guestRepository.findByNameAndSurname(name, surname);
+    @Override
+    public List<Guest> searchGuests(String documentNumber, String surname, String email, String nationality, String name, String documentType, String phone) {
+        return guestRepository.searchGuests(documentNumber, surname, email, nationality, name, documentType, phone);
     }
 }

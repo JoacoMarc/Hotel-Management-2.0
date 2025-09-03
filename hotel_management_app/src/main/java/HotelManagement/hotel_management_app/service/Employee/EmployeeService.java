@@ -15,9 +15,7 @@ public interface EmployeeService {
     Employee deleteEmployeeByEmail(String email); // DELETE por email
     List<Employee> getEmployeesByHotelId(UUID hotelId);
     List<Employee> getEmployeesByEmployeeCode(String employeeCode);
-    List<Employee> getEmployeesByEmail(String email);
-    List<Employee> getEmployeesByName(String name);
-    List<Employee> getEmployeesBySurname(String surname);
-    List<Employee> getEmployeesByHireDate(LocalDate hireDate);
-    List<Employee> getEmployeesByNameAndSurname(String name, String surname);
+    List<Employee> getEmployeesByRole(String role);
+    // Método de búsqueda con múltiples filtros opcionales
+    List<Employee> searchEmployees(String name, String surname, String email, LocalDate hireDate, String role);
 }

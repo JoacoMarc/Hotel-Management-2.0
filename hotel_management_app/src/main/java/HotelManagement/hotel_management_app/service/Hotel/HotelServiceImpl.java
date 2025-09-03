@@ -55,31 +55,8 @@ public class HotelServiceImpl implements HotelService {
         hotelRepository.deleteById(id);
     }
 
-    public List<Room> getRoomsByCountry(String country) {
-        List<Hotel> hotels = hotelRepository.findByCountry(country);
-        return hotels.stream()
-                .flatMap(hotel -> hotel.getRooms().stream())
-                .toList();
-    }
-
-    public List<Room> getRoomsByCity(String city) {
-        List<Hotel> hotels = hotelRepository.findByCity(city);
-        return hotels.stream()
-                .flatMap(hotel -> hotel.getRooms().stream())
-                .toList();
-    }
-
-    public List<Room> getRoomsByState(String state) {
-        List<Hotel> hotels = hotelRepository.findByState(state);
-        return hotels.stream()
-                .flatMap(hotel -> hotel.getRooms().stream())
-                .toList();
-    }
-
-    public List<Room> getRoomsByHotelType(String hotelType) {
-        List<Hotel> hotels = hotelRepository.findByHotelType(hotelType);
-        return hotels.stream()
-                .flatMap(hotel -> hotel.getRooms().stream())
-                .toList();
+    @Override
+    public List<Hotel> searchHotels(String country, String city, String state, String type, String name, Integer minRating, Integer maxRating, String zipCode, String phone, String email) {
+        return hotelRepository.searchHotels(country, city, state, type, name, minRating, maxRating, zipCode, phone, email);
     }
 }

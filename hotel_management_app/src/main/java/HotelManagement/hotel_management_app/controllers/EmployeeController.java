@@ -5,15 +5,15 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -53,8 +53,9 @@ public class EmployeeController {
         employee.setPhone(employeeRequest.getPhone());
         employee.setEmployeeCode(employeeRequest.getEmployeeCode());
         employee.setHireDate(employeeRequest.getHireDate());
+        employee.setRole(employeeRequest.getRole());
         
-        // Obtener y asignar el hotel real
+        // Obtener y asignar el hotel 
         if (employeeRequest.getHotelId() != null) {
             Hotel hotel = hotelService.getHotelById(employeeRequest.getHotelId());
             employee.setHotel(hotel);
@@ -88,24 +89,16 @@ public class EmployeeController {
     public List<Employee> getEmployeesByEmployeeCode(@PathVariable String employeeCode) {
         return employeeService.getEmployeesByEmployeeCode(employeeCode);
     }
-
-    @GetMapping("/hire-date")
-    public List<Employee> getEmployeesByHireDate(@RequestParam String hireDate) {
-        return employeeService.getEmployeesByHireDate(LocalDate.parse(hireDate));
-    }
-
-    @GetMapping("/surname/{surname}")
-    public List<Employee> getEmployeesBySurname(@PathVariable String surname) {
-        return employeeService.getEmployeesBySurname(surname);
-    }
-
-    @GetMapping("/name/{name}")
-    public List<Employee> getEmployeesByName(@PathVariable String name) {
-        return employeeService.getEmployeesByName(name);
-    }
-
-    @GetMapping("/email/{email}")
-    public List<Employee> getEmployeesByEmail(@PathVariable String email) {
-        return employeeService.getEmployeesByEmail(email);
+    
+    // Búsqueda con filtros múltiples usando query parameters
+    @GetMapping("/search")
+    public List<Employee> searchEmployees(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String surname,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String hireDate,
+            @RequestParam(required = false) String role) {
+        LocalDate parsedHireDate = hireDate != null ? LocalDate.parse(hireDate) : null;
+        return employeeService.searchEmployees(name, surname, email, parsedHireDate, role);
     }
 }

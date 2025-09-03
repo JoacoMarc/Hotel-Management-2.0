@@ -56,9 +56,9 @@ public class RoomController {
     @GetMapping("/hotels/{hotelId}/rooms/{roomId}")
     public Room getRoomInHotel(@PathVariable UUID hotelId, @PathVariable UUID roomId) {
         Room room = roomService.getRoomById(roomId);
-        // Validar que la habitación pertenece al hotel
-        if (!room.getHotel().getId().equals(hotelId)) {
-            throw new RuntimeException("Room does not belong to this hotel");
+        // Validar que la habitación pertenece al hotel y/o hotel no existe
+        if (!room.getHotel().getId().equals(hotelId) || room.getHotel() == null) {
+            throw new RuntimeException("Room does not belong to this hotel or hotel does not exist");
         }
         return room;
     }
@@ -96,29 +96,20 @@ public class RoomController {
         return roomService.getRoomById(roomId);
     }
 
-    // Búsquedas específicas
-    @GetMapping("/rooms/type/{roomType}")
-    public List<Room> getRoomsByRoomType(@PathVariable String roomType) {
-        return roomService.getRoomsByRoomType(roomType);
-    }
-
-    @GetMapping("/rooms/price")
-    public List<Room> getRoomsByRoomPrice(@RequestParam double roomPrice) {
-        return roomService.getRoomsByRoomPrice(roomPrice);
-    }
-
-    @GetMapping("/rooms/capacity")
-    public List<Room> getRoomsByRoomCapacity(@RequestParam int roomCapacity) {
-        return roomService.getRoomsByRoomCapacity(roomCapacity);
-    }
-
-    @GetMapping("/rooms/availability")
-    public List<Room> getRoomsByRoomAvailability(@RequestParam boolean roomAvailability) {
-        return roomService.getRoomsByRoomAvailability(roomAvailability);
-    }
-
-    @GetMapping("/rooms/number/{roomNumber}")
-    public List<Room> getRoomsByRoomNumber(@PathVariable String roomNumber) {
-        return roomService.getRoomsByRoomNumber(roomNumber);
+    // Búsqueda con filtros múltiples usando query parameters
+    @GetMapping("/rooms/search")
+    public List<Room> searchRooms(
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) Double price,
+            @RequestParam(required = false) Integer capacity,
+            @RequestParam(required = false) Boolean available,
+            @RequestParam(required = false) String number,
+            @RequestParam(required = false) UUID hotelId,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) String hotelName,
+            @RequestParam(required = false) String hotelCity,
+            @RequestParam(required = false) String hotelCountry) {
+        return roomService.searchRooms(type, price, capacity, available, number, hotelId, minPrice, maxPrice, hotelName, hotelCity, hotelCountry);
     }
 }

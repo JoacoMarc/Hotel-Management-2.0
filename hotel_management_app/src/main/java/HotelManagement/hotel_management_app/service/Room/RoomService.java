@@ -12,11 +12,8 @@ public interface RoomService {
     Room updateRoom(UUID id, Room room);
     void deleteRoom(UUID id);
     List<Room> getRoomsByHotelId(UUID hotelId);
-    List<Room> getRoomsByRoomType(String roomType);
-    List<Room> getRoomsByRoomPrice(double roomPrice);
-    List<Room> getRoomsByRoomCapacity(int roomCapacity);
-    List<Room> getRoomsByRoomAvailability(boolean roomAvailability);
-    List<Room> getRoomsByRoomNumber(String roomNumber);
+    // Método de búsqueda con múltiples filtros opcionales
+    List<Room> searchRooms(String type, Double price, Integer capacity, Boolean available, String number, UUID hotelId, Double minPrice, Double maxPrice, String hotelName, String hotelCity, String hotelCountry);
 }
 
     

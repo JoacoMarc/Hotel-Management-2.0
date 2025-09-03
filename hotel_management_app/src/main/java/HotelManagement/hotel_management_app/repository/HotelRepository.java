@@ -32,4 +32,27 @@ public interface HotelRepository extends JpaRepository<Hotel, UUID> {
     List<Hotel> findByRatingGreaterThanEqual(int rating);
 
     List<Hotel> findByNameAndCity(String name, String city);
+    
+        // Búsqueda con múltiples filtros opcionales
+    @Query("SELECT h FROM Hotel h WHERE " +
+           "(:country IS NULL OR h.country = :country) AND " +
+           "(:city IS NULL OR h.city = :city) AND " +
+           "(:state IS NULL OR h.state = :state) AND " +
+           "(:type IS NULL OR h.hotelType = :type) AND " +
+           "(:name IS NULL OR h.name LIKE %:name%) AND " +
+           "(:minRating IS NULL OR h.rating >= :minRating) AND " +
+           "(:maxRating IS NULL OR h.rating <= :maxRating) AND " +
+           "(:zipCode IS NULL OR h.zipCode = :zipCode) AND " +
+           "(:phone IS NULL OR h.phone = :phone) AND " +
+           "(:email IS NULL OR h.email = :email)")
+    List<Hotel> searchHotels(@Param("country") String country,
+                            @Param("city") String city,
+                            @Param("state") String state,
+                            @Param("type") String type,
+                            @Param("name") String name,
+                            @Param("minRating") Integer minRating,
+                            @Param("maxRating") Integer maxRating,
+                            @Param("zipCode") String zipCode,
+                            @Param("phone") String phone,
+                            @Param("email") String email);
 }
