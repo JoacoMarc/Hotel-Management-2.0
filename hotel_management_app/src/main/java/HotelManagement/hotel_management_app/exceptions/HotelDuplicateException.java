@@ -1,0 +1,11 @@
+package HotelManagement.hotel_management_app.exceptions;
+
+public class HotelDuplicateException extends RuntimeException {
+    public HotelDuplicateException() {
+        super("Hotel already exists with this name");
+    }
+    
+    public HotelDuplicateException(String message) {
+        super(message);
+    }
+}

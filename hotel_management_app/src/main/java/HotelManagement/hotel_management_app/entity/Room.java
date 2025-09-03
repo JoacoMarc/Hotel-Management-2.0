@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 @Data
 @Entity
 @Table(name = "rooms")
@@ -20,23 +21,24 @@ public class Room {
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "room_number")
+    @Column(name = "room_number", nullable = false)
     private String roomNumber;
     
-    @Column(name = "room_type")
+    @Column(name = "room_type", nullable = false)
     private String roomType;
     
-    @Column(name = "room_price")
+    @Column(name = "room_price", nullable = false)
     private double roomPrice;
 
-    @Column(name = "room_capacity")
+    @Column(name = "room_capacity", nullable = false)
     private int roomCapacity;
 
-    @Column(name = "room_availability")
+    @Column(name = "room_availability", nullable = false)
     private boolean roomAvailability;
 
-    @ManyToOne
-    @JoinColumn(name = "hotel_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "hotel_id", nullable = false)
+    @JsonIgnore  // No incluir en respuestas JSON
     private Hotel hotel;
     
 }

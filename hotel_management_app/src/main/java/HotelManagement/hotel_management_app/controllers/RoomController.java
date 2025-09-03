@@ -1,0 +1,124 @@
+package HotelManagement.hotel_management_app.controllers;
+
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import org.springframework.web.bind.annotation.RestController;
+
+import HotelManagement.hotel_management_app.entity.Room;
+import HotelManagement.hotel_management_app.entity.Hotel;
+import HotelManagement.hotel_management_app.entity.dto.RoomRequest;
+import HotelManagement.hotel_management_app.service.Room.RoomService;
+import HotelManagement.hotel_management_app.service.Hotel.HotelService;
+
+@RestController
+public class RoomController {
+    @Autowired
+    private RoomService roomService;
+    
+    @Autowired
+    private HotelService hotelService;
+
+    // ===== RUTAS ANIDADAS (Recomendadas para operaciones específicas de hotel) =====
+    
+    @PostMapping("/hotels/{hotelId}/rooms")
+    public Room createRoomInHotel(@PathVariable UUID hotelId, @RequestBody RoomRequest roomRequest) {
+        // Obtener el hotel real de la base de datos
+        Hotel hotel = hotelService.getHotelById(hotelId);
+        
+        // Crear la habitación con los datos del request
+        Room room = new Room();
+        room.setRoomNumber(roomRequest.getRoomNumber());
+        room.setRoomType(roomRequest.getRoomType());
+        room.setRoomPrice(roomRequest.getRoomPrice());
+        room.setRoomCapacity(roomRequest.getRoomCapacity());
+        room.setRoomAvailability(roomRequest.isRoomAvailability());
+        room.setHotel(hotel);  // Asignar el hotel REAL
+        
+        return roomService.createRoom(room);
+    }
+    
+    @GetMapping("/hotels/{hotelId}/rooms")
+    public List<Room> getRoomsByHotel(@PathVariable UUID hotelId) {
+        return roomService.getRoomsByHotelId(hotelId);
+    }
+    
+    @GetMapping("/hotels/{hotelId}/rooms/{roomId}")
+    public Room getRoomInHotel(@PathVariable UUID hotelId, @PathVariable UUID roomId) {
+        Room room = roomService.getRoomById(roomId);
+        // Validar que la habitación pertenece al hotel
+        if (!room.getHotel().getId().equals(hotelId)) {
+            throw new RuntimeException("Room does not belong to this hotel");
+        }
+        return room;
+    }
+    
+    @PutMapping("/hotels/{hotelId}/rooms/{roomId}")
+    public Room updateRoomInHotel(@PathVariable UUID hotelId, @PathVariable UUID roomId, @RequestBody Room room) {
+        // Asegurar que la habitación sigue perteneciendo al hotel correcto
+        if (room.getHotel() == null) {
+            room.setHotel(new HotelManagement.hotel_management_app.entity.Hotel());
+        }
+        room.getHotel().setId(hotelId);
+        return roomService.updateRoom(roomId, room);
+    }
+    
+    @DeleteMapping("/hotels/{hotelId}/rooms/{roomId}")
+    public ResponseEntity<Void> deleteRoomFromHotel(@PathVariable UUID hotelId, @PathVariable UUID roomId) {
+        Room room = roomService.getRoomById(roomId);
+        // Validar que la habitación pertenece al hotel
+        if (!room.getHotel().getId().equals(hotelId)) {
+            throw new RuntimeException("Room does not belong to this hotel");
+        }
+        roomService.deleteRoom(roomId);
+        return ResponseEntity.noContent().build();
+    }
+
+    // ===== RUTAS GLOBALES (Para consultas generales) =====
+    
+    @GetMapping("/rooms")
+    public List<Room> getAllRooms() {
+        return roomService.getAllRooms();
+    }
+    
+    @GetMapping("/rooms/{roomId}")
+    public Room getRoomById(@PathVariable UUID roomId) {
+        return roomService.getRoomById(roomId);
+    }
+
+    // Búsquedas específicas
+    @GetMapping("/rooms/type/{roomType}")
+    public List<Room> getRoomsByRoomType(@PathVariable String roomType) {
+        return roomService.getRoomsByRoomType(roomType);
+    }
+
+    @GetMapping("/rooms/price")
+    public List<Room> getRoomsByRoomPrice(@RequestParam double roomPrice) {
+        return roomService.getRoomsByRoomPrice(roomPrice);
+    }
+
+    @GetMapping("/rooms/capacity")
+    public List<Room> getRoomsByRoomCapacity(@RequestParam int roomCapacity) {
+        return roomService.getRoomsByRoomCapacity(roomCapacity);
+    }
+
+    @GetMapping("/rooms/availability")
+    public List<Room> getRoomsByRoomAvailability(@RequestParam boolean roomAvailability) {
+        return roomService.getRoomsByRoomAvailability(roomAvailability);
+    }
+
+    @GetMapping("/rooms/number/{roomNumber}")
+    public List<Room> getRoomsByRoomNumber(@PathVariable String roomNumber) {
+        return roomService.getRoomsByRoomNumber(roomNumber);
+    }
+}

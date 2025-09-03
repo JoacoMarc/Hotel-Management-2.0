@@ -1,0 +1,229 @@
+package HotelManagement.hotel_management_app.service.Booking;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import HotelManagement.hotel_management_app.entity.Booking;
+import HotelManagement.hotel_management_app.entity.Guest;
+import HotelManagement.hotel_management_app.entity.Hotel;
+import HotelManagement.hotel_management_app.entity.Room;
+import HotelManagement.hotel_management_app.entity.BookingStatus;
+import HotelManagement.hotel_management_app.entity.dto.BookingRequest;
+import HotelManagement.hotel_management_app.repository.BookingRepository;
+import HotelManagement.hotel_management_app.repository.GuestRepository;
+import HotelManagement.hotel_management_app.repository.HotelRepository;
+import HotelManagement.hotel_management_app.service.Guest.GuestService;
+import HotelManagement.hotel_management_app.service.Hotel.HotelService;
+import HotelManagement.hotel_management_app.service.Room.RoomService;
+import HotelManagement.hotel_management_app.exceptions.BookingNotFoundException;
+import HotelManagement.hotel_management_app.exceptions.BookingDuplicateException;
+import HotelManagement.hotel_management_app.exceptions.GuestNotFoundException;
+import HotelManagement.hotel_management_app.exceptions.HotelNotFoundException;
+
+@Service
+public class BookingServiceImpl implements BookingService {
+
+        @Autowired
+    private BookingRepository bookingRepository;
+
+    @Autowired
+    private GuestRepository guestRepository;
+
+    @Autowired
+    private HotelRepository hotelRepository;
+    
+    @Autowired
+    private GuestService guestService;
+    
+    @Autowired
+    private HotelService hotelService;
+    
+    @Autowired
+    private RoomService roomService;
+
+    public List<Booking> getAllBookings() {
+        return bookingRepository.findAll();
+    }
+
+    public Booking getBookingById(UUID id) {
+        return bookingRepository.findById(id).orElseThrow(() -> new BookingNotFoundException());
+    }
+
+    public Booking createBooking(Booking booking) throws BookingDuplicateException {
+        // Validar que los huéspedes existen
+        if (booking.getGuests() != null && !booking.getGuests().isEmpty()) {
+            for (Guest guest : booking.getGuests()) {
+                if (guest.getId() != null) {
+                    guestRepository.findById(guest.getId())
+                        .orElseThrow(() -> new GuestNotFoundException());
+                }
+            }
+        }
+        
+        // Validar que el hotel existe
+        if (booking.getHotel() != null && booking.getHotel().getId() != null) {
+            hotelRepository.findById(booking.getHotel().getId())
+                .orElseThrow(() -> new HotelNotFoundException());
+        }
+        
+        // VALIDAR DISPONIBILIDAD Y CONFLICTOS DE HABITACIONES
+        if (booking.getRooms() != null && !booking.getRooms().isEmpty()) {
+            for (Room room : booking.getRooms()) {
+                // 1. Verificar que la habitación esté disponible
+                if (!room.isRoomAvailability()) {
+                    throw new BookingDuplicateException(
+                        "Room " + room.getRoomNumber() + " is not available"
+                    );
+                }
+                
+                // 2. Verificar conflictos de fechas en la habitación
+                List<Booking> roomConflicts = findRoomConflictingBookings(
+                    room.getId(), 
+                    booking.getCheckInDate(), 
+                    booking.getCheckOutDate()
+                );
+                if (!roomConflicts.isEmpty()) {
+                    throw new BookingDuplicateException(
+                        "Room " + room.getRoomNumber() + " is already booked for the selected dates"
+                    );
+                }
+            }
+            
+            // 3. Validar capacidad total
+            int totalGuests = booking.getGuests() != null ? booking.getGuests().size() : 0;
+            int totalCapacity = booking.getRooms().stream()
+                .mapToInt(Room::getRoomCapacity)
+                .sum();
+                
+            if (totalGuests > totalCapacity) {
+                throw new BookingDuplicateException(
+                    String.format("Insufficient capacity. Guests: %d, Total capacity: %d", 
+                    totalGuests, totalCapacity)
+                );
+            }
+        }
+        
+        return bookingRepository.save(booking);
+    }
+    
+    // Nuevo método que sigue el patrón correcto: Controller -> Service
+    public Booking createBookingFromRequest(BookingRequest bookingRequest) throws BookingDuplicateException {
+        // Crear el objeto Booking
+        Booking booking = new Booking();
+        booking.setCheckInDate(bookingRequest.getCheckInDate());
+        booking.setCheckOutDate(bookingRequest.getCheckOutDate());
+        booking.setTotalPrice(bookingRequest.getTotalPrice());
+        booking.setStatus(BookingStatus.valueOf(bookingRequest.getStatus()));
+        
+        // Obtener y asignar los huéspedes
+        if (bookingRequest.getGuestIds() != null && !bookingRequest.getGuestIds().isEmpty()) {
+            List<Guest> guests = bookingRequest.getGuestIds().stream()
+                .map(guestId -> guestService.getGuestById(guestId))
+                .toList();
+            booking.setGuests(guests);
+        }
+        
+        // Obtener y asignar el hotel
+        if (bookingRequest.getHotelId() != null) {
+            Hotel hotel = hotelService.getHotelById(bookingRequest.getHotelId());
+            booking.setHotel(hotel);
+        }
+        
+        // Obtener y asignar las habitaciones
+        if (bookingRequest.getRoomIds() != null && !bookingRequest.getRoomIds().isEmpty()) {
+            List<Room> rooms = bookingRequest.getRoomIds().stream()
+                .map(roomId -> roomService.getRoomById(roomId))
+                .toList();
+            booking.setRooms(rooms);
+        }
+        
+        // Delegar al método createBooking que ya tiene todas las validaciones
+        return createBooking(booking);
+    }
+
+    public Booking updateBooking(UUID id, Booking booking) {
+        Booking existingBooking = bookingRepository.findById(id).orElseThrow(() -> new BookingNotFoundException());
+        existingBooking.setCheckInDate(booking.getCheckInDate());
+        existingBooking.setCheckOutDate(booking.getCheckOutDate());
+        existingBooking.setTotalPrice(booking.getTotalPrice());
+        existingBooking.setStatus(booking.getStatus());
+        
+        // Actualizar relaciones si se proporcionan
+        if (booking.getGuests() != null) {
+            existingBooking.setGuests(booking.getGuests());
+        }
+        if (booking.getHotel() != null) {
+            existingBooking.setHotel(booking.getHotel());
+        }
+        if (booking.getRooms() != null) {
+            existingBooking.setRooms(booking.getRooms());
+        }
+        
+        return bookingRepository.save(existingBooking);
+    }
+
+    public void deleteBooking(UUID id) {
+        bookingRepository.findById(id).orElseThrow(() -> new BookingNotFoundException());
+        bookingRepository.deleteById(id);
+    }
+
+    public List<Booking> getBookingsByGuestId(UUID guestId) {
+        Guest guest = guestRepository.findById(guestId).orElseThrow(() -> new GuestNotFoundException());
+        return bookingRepository.findByGuest(guest);
+    }
+    
+    public List<Booking> getBookingsByHotelId(UUID hotelId) {
+        Hotel hotel = hotelRepository.findById(hotelId).orElseThrow(() -> new HotelNotFoundException());
+        return bookingRepository.findByHotel(hotel);
+    }
+
+    public List<Booking> getBookingsByRoomId(UUID roomId) {
+        return bookingRepository.findBookingsWithRoom(roomId);
+    }
+    
+    public List<Booking> getBookingsByCheckInDate(LocalDate checkInDate) {
+        return bookingRepository.findByCheckInDate(checkInDate);
+    }
+    
+    public List<Booking> getBookingsByCheckOutDate(LocalDate checkOutDate) {
+        return bookingRepository.findByCheckOutDate(checkOutDate);
+    }
+    
+    public List<Booking> getBookingsByStatus(String status) {
+        try {
+            BookingStatus bookingStatus = BookingStatus.valueOf(status.toUpperCase());
+            return bookingRepository.findByStatus(bookingStatus);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid booking status: " + status);
+        }
+    }
+    
+    // Métodos para obtener huéspedes por hotel
+    public List<Guest> getGuestsByHotelId(UUID hotelId) {
+        Hotel hotel = hotelRepository.findById(hotelId).orElseThrow(() -> new HotelNotFoundException());
+        List<Booking> bookings = bookingRepository.findByHotel(hotel);
+        return bookings.stream()
+                .flatMap(booking -> booking.getGuests() != null ? booking.getGuests().stream() : Stream.empty())
+                .distinct()
+                .collect(Collectors.toList());
+    }
+    // Métodos para obtener huéspedes por habitación
+    public List<Guest> getGuestsByRoomId(UUID roomId) {
+        List<Booking> bookings = bookingRepository.findBookingsWithRoom(roomId);
+        return bookings.stream()
+                .flatMap(booking -> booking.getGuests() != null ? booking.getGuests().stream() : Stream.empty())
+                .distinct()
+                .collect(Collectors.toList());
+    }
+    
+    // Método para verificar conflictos de habitaciones
+    public List<Booking> findRoomConflictingBookings(UUID roomId, LocalDate checkInDate, LocalDate checkOutDate) {
+        return bookingRepository.findRoomConflictingBookings(roomId, checkInDate, checkOutDate);
+    }
+}

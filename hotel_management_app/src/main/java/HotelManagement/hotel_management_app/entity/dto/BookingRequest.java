@@ -12,7 +12,7 @@ public class BookingRequest {
     private LocalDate checkOutDate;
     private double totalPrice;
     private String status; // BookingStatus como String
-    private UUID guestId;
+    private List<UUID> guestIds; // Lista de huéspedes
     private UUID hotelId;
     private List<UUID> roomIds;
 }

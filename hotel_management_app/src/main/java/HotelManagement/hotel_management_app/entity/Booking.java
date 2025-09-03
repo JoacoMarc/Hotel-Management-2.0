@@ -14,23 +14,27 @@ public class Booking {
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "check_in_date")
+    @Column(name = "check_in_date" , nullable = false)
     private LocalDate checkInDate;
     
-    @Column(name = "check_out_date")
+    @Column(name = "check_out_date", nullable = false)
     private LocalDate checkOutDate;
 
-    @Column(name = "total_price")
+    @Column(name = "total_price", nullable = false)
     private double totalPrice;
     
     @Enumerated(EnumType.STRING)
-    @Column(name = "status")
+    @Column(name = "status", nullable = false)
     private BookingStatus status;
 
-    // Relación con Huésped
-    @ManyToOne
-    @JoinColumn(name = "guest_id")
-    private Guest guest;
+    // Relación con Huéspedes (puede haber múltiples)
+    @ManyToMany
+    @JoinTable(
+        name = "booking_guests",
+        joinColumns = @JoinColumn(name = "booking_id"),
+        inverseJoinColumns = @JoinColumn(name = "guest_id")
+    )
+    private List<Guest> guests;
 
     // Relación directa con Hotel
     @ManyToOne
