@@ -10,19 +10,19 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import HotelManagement.hotel_management_app.entity.Booking;
-import HotelManagement.hotel_management_app.entity.Guest;
+import HotelManagement.hotel_management_app.entity.User;
 import HotelManagement.hotel_management_app.entity.Hotel;
 import HotelManagement.hotel_management_app.entity.BookingStatus;
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, UUID> {
 
-// Buscar reservas por huésped (Many-to-Many)
-@Query("SELECT b FROM Booking b JOIN b.guests g WHERE g = :guest")
-List<Booking> findByGuest(@Param("guest") Guest guest);
+// Buscar reservas por usuario (Many-to-Many)
+@Query("SELECT b FROM Booking b JOIN b.guests g WHERE g = :user")
+List<Booking> findByUser(@Param("user") User user);
 
-@Query("SELECT b FROM Booking b JOIN b.guests g WHERE g.id = :guestId")
-List<Booking> findByGuestId(@Param("guestId") UUID guestId);
+@Query("SELECT b FROM Booking b JOIN b.guests g WHERE g.id = :userId")
+List<Booking> findByUserId(@Param("userId") UUID userId);
 
 // Buscar reservas por hotel
 List<Booking> findByHotel(Hotel hotel);

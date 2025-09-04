@@ -61,7 +61,7 @@ public class Hotel {
 
     @OneToMany(mappedBy = "hotel", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JsonIgnore // Evitar bucle infinito en JSON
-    private List<Employee> employees;
+    private List<User> employees;
 
 }
 

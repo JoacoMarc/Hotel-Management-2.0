@@ -10,20 +10,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import HotelManagement.hotel_management_app.entity.Booking;
-import HotelManagement.hotel_management_app.entity.Guest;
+import HotelManagement.hotel_management_app.entity.User;
 import HotelManagement.hotel_management_app.entity.Hotel;
 import HotelManagement.hotel_management_app.entity.Room;
 import HotelManagement.hotel_management_app.entity.BookingStatus;
 import HotelManagement.hotel_management_app.entity.dto.BookingRequest;
 import HotelManagement.hotel_management_app.repository.BookingRepository;
-import HotelManagement.hotel_management_app.repository.GuestRepository;
+import HotelManagement.hotel_management_app.repository.UserRepository;
 import HotelManagement.hotel_management_app.repository.HotelRepository;
-import HotelManagement.hotel_management_app.service.Guest.GuestService;
+import HotelManagement.hotel_management_app.service.User.UserService;
 import HotelManagement.hotel_management_app.service.Hotel.HotelService;
 import HotelManagement.hotel_management_app.service.Room.RoomService;
 import HotelManagement.hotel_management_app.exceptions.BookingNotFoundException;
 import HotelManagement.hotel_management_app.exceptions.BookingDuplicateException;
-import HotelManagement.hotel_management_app.exceptions.GuestNotFoundException;
 import HotelManagement.hotel_management_app.exceptions.HotelNotFoundException;
 
 @Service
@@ -33,13 +32,13 @@ public class BookingServiceImpl implements BookingService {
     private BookingRepository bookingRepository;
 
     @Autowired
-    private GuestRepository guestRepository;
+    private UserRepository userRepository;
 
     @Autowired
     private HotelRepository hotelRepository;
     
     @Autowired
-    private GuestService guestService;
+    private UserService userService;
     
     @Autowired
     private HotelService hotelService;
@@ -56,12 +55,12 @@ public class BookingServiceImpl implements BookingService {
     }
 
     public Booking createBooking(Booking booking) throws BookingDuplicateException {
-        // Validar que los huéspedes existen
+        // Validar que los usuarios existen
         if (booking.getGuests() != null && !booking.getGuests().isEmpty()) {
-            for (Guest guest : booking.getGuests()) {
-                if (guest.getId() != null) {
-                    guestRepository.findById(guest.getId())
-                        .orElseThrow(() -> new GuestNotFoundException());
+            for (User user : booking.getGuests()) {
+                if (user.getId() != null) {
+                    userRepository.findById(user.getId())
+                        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
                 }
             }
         }
@@ -121,12 +120,12 @@ public class BookingServiceImpl implements BookingService {
         booking.setTotalPrice(bookingRequest.getTotalPrice());
         booking.setStatus(BookingStatus.valueOf(bookingRequest.getStatus()));
         
-        // Obtener y asignar los huéspedes
-        if (bookingRequest.getGuestIds() != null && !bookingRequest.getGuestIds().isEmpty()) {
-            List<Guest> guests = bookingRequest.getGuestIds().stream()
-                .map(guestId -> guestService.getGuestById(guestId))
+        // Obtener y asignar los usuarios
+        if (bookingRequest.getUserIds() != null && !bookingRequest.getUserIds().isEmpty()) {
+            List<User> users = bookingRequest.getUserIds().stream()
+                .map(userId -> userService.getUserById(userId))
                 .toList();
-            booking.setGuests(guests);
+            booking.setGuests(users);
         }
         
         // Obtener y asignar el hotel
@@ -173,9 +172,9 @@ public class BookingServiceImpl implements BookingService {
         bookingRepository.deleteById(id);
     }
 
-    public List<Booking> getBookingsByGuestId(UUID guestId) {
-        Guest guest = guestRepository.findById(guestId).orElseThrow(() -> new GuestNotFoundException());
-        return bookingRepository.findByGuest(guest);
+    public List<Booking> getBookingsByUserId(UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        return bookingRepository.findByUser(user);
     }
     
     
@@ -203,8 +202,8 @@ public class BookingServiceImpl implements BookingService {
         return bookingRepository.searchBookings(checkInDate, checkOutDate, bookingStatus, hotelId, guestId, roomId, minPrice, maxPrice, guestSurname, guestName, guestDocumentNumber);
     }
     
-    // Métodos para obtener huéspedes por hotel
-    public List<Guest> getGuestsByHotelId(UUID hotelId) {
+    // Métodos para obtener usuarios por hotel
+    public List<User> getUsersByHotelId(UUID hotelId) {
         Hotel hotel = hotelRepository.findById(hotelId).orElseThrow(() -> new HotelNotFoundException());
         List<Booking> bookings = bookingRepository.findByHotel(hotel);
         return bookings.stream()
@@ -212,8 +211,9 @@ public class BookingServiceImpl implements BookingService {
                 .distinct()
                 .collect(Collectors.toList());
     }
-    // Métodos para obtener huéspedes por habitación
-    public List<Guest> getGuestsByRoomId(UUID roomId) {
+    
+    // Métodos para obtener usuarios por habitación
+    public List<User> getUsersByRoomId(UUID roomId) {
         List<Booking> bookings = bookingRepository.findBookingsWithRoom(roomId);
         return bookings.stream()
                 .flatMap(booking -> booking.getGuests() != null ? booking.getGuests().stream() : Stream.empty())

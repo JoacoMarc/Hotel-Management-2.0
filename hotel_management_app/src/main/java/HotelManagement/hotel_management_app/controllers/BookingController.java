@@ -16,33 +16,45 @@ import org.springframework.web.bind.annotation.RestController;
 
 import HotelManagement.hotel_management_app.entity.Booking;
 import HotelManagement.hotel_management_app.entity.dto.BookingRequest;
+import HotelManagement.hotel_management_app.entity.dto.BookingResponse;
 import HotelManagement.hotel_management_app.service.Booking.BookingService;
+import HotelManagement.hotel_management_app.service.Booking.BookingMapper;
 import java.time.LocalDate;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/bookings")
+@RequestMapping("/api/v1/bookings")
 public class BookingController {
     @Autowired
     private BookingService bookingService;
+    
+    @Autowired
+    private BookingMapper bookingMapper;
 
     @GetMapping
-    public List<Booking> getAllBookings() {
-        return bookingService.getAllBookings();
+    public List<BookingResponse> getAllBookings() {
+        List<Booking> bookings = bookingService.getAllBookings();
+        return bookings.stream()
+                .map(bookingMapper::toBookingResponse)
+                .collect(Collectors.toList());
     }
     
     @GetMapping("/{bookingId}")
-    public Booking getBookingById(@PathVariable UUID bookingId) {
-        return bookingService.getBookingById(bookingId);
+    public BookingResponse getBookingById(@PathVariable UUID bookingId) {
+        Booking booking = bookingService.getBookingById(bookingId);
+        return bookingMapper.toBookingResponse(booking);
     }
     
     @PostMapping
-    public Booking createBooking(@RequestBody BookingRequest bookingRequest) {
-        return bookingService.createBookingFromRequest(bookingRequest);
+    public BookingResponse createBooking(@RequestBody BookingRequest bookingRequest) {
+        Booking booking = bookingService.createBookingFromRequest(bookingRequest);
+        return bookingMapper.toBookingResponse(booking);
     }
     
     @PutMapping("/{bookingId}")
-    public Booking updateBooking(@PathVariable UUID bookingId, @RequestBody Booking booking) {
-        return bookingService.updateBooking(bookingId, booking);
+    public BookingResponse updateBooking(@PathVariable UUID bookingId, @RequestBody Booking booking) {
+        Booking updatedBooking = bookingService.updateBooking(bookingId, booking);
+        return bookingMapper.toBookingResponse(updatedBooking);
     }
     
     @DeleteMapping("/{bookingId}")
@@ -52,24 +64,33 @@ public class BookingController {
     }
     
     // Búsquedas específicas con rutas claras
-    @GetMapping("/guest/{guestId}")
-    public List<Booking> getBookingsByGuestId(@PathVariable UUID guestId) {
-        return bookingService.getBookingsByGuestId(guestId);
+    @GetMapping("/user/{userId}")
+    public List<BookingResponse> getBookingsByUserId(@PathVariable UUID userId) {
+        List<Booking> bookings = bookingService.getBookingsByUserId(userId);
+        return bookings.stream()
+                .map(bookingMapper::toBookingResponse)
+                .collect(Collectors.toList());
     }
     
     @GetMapping("/hotel/{hotelId}")
-    public List<Booking> getBookingsByHotelId(@PathVariable UUID hotelId) {
-        return bookingService.getBookingsByHotelId(hotelId);
+    public List<BookingResponse> getBookingsByHotelId(@PathVariable UUID hotelId) {
+        List<Booking> bookings = bookingService.getBookingsByHotelId(hotelId);
+        return bookings.stream()
+                .map(bookingMapper::toBookingResponse)
+                .collect(Collectors.toList());
     }
     
     @GetMapping("/room/{roomId}")
-    public List<Booking> getBookingsByRoomId(@PathVariable UUID roomId) {
-        return bookingService.getBookingsByRoomId(roomId);
+    public List<BookingResponse> getBookingsByRoomId(@PathVariable UUID roomId) {
+        List<Booking> bookings = bookingService.getBookingsByRoomId(roomId);
+        return bookings.stream()
+                .map(bookingMapper::toBookingResponse)
+                .collect(Collectors.toList());
     }
     
     // Búsqueda con filtros múltiples usando query parameters
     @GetMapping("/search")
-    public List<Booking> searchBookings(
+    public List<BookingResponse> searchBookings(
             @RequestParam(required = false) String checkInDate,
             @RequestParam(required = false) String checkOutDate,
             @RequestParam(required = false) String status,
@@ -83,7 +104,10 @@ public class BookingController {
             @RequestParam(required = false) String guestName) {
         LocalDate parsedCheckInDate = checkInDate != null ? LocalDate.parse(checkInDate) : null;
         LocalDate parsedCheckOutDate = checkOutDate != null ? LocalDate.parse(checkOutDate) : null;
-        return bookingService.searchBookings(parsedCheckInDate, parsedCheckOutDate, status, hotelId, guestId, roomId, minPrice, maxPrice, guestSurname, 
+        List<Booking> bookings = bookingService.searchBookings(parsedCheckInDate, parsedCheckOutDate, status, hotelId, guestId, roomId, minPrice, maxPrice, guestSurname, 
         guestName, guestDocumentNumber);
+        return bookings.stream()
+                .map(bookingMapper::toBookingResponse)
+                .collect(Collectors.toList());
     }
 }

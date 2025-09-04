@@ -19,7 +19,7 @@ import HotelManagement.hotel_management_app.entity.Hotel;
 import HotelManagement.hotel_management_app.service.Hotel.HotelService;
 
 @RestController
-@RequestMapping("/hotels")
+@RequestMapping("/api/v1/hotels")
 public class HotelController {
     @Autowired
     private HotelService hotelService;

@@ -12,7 +12,7 @@ public class BookingRequest {
     private LocalDate checkOutDate;
     private double totalPrice;
     private String status;
-    private List<UUID> guestIds; 
+    private List<UUID> userIds; // IDs de los usuarios que hacen la reserva 
     private UUID hotelId;
     private List<UUID> roomIds;
 }

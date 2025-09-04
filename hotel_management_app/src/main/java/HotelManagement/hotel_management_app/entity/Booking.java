@@ -27,14 +27,14 @@ public class Booking {
     @Column(name = "status", nullable = false)
     private BookingStatus status;
 
-    // Relación con Huéspedes (puede haber múltiples)
+    // Relación con Usuarios (huéspedes que hacen la reserva)
     @ManyToMany
     @JoinTable(
-        name = "booking_guests",
+        name = "booking_users",
         joinColumns = @JoinColumn(name = "booking_id"),
-        inverseJoinColumns = @JoinColumn(name = "guest_id")
+        inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private List<Guest> guests;
+    private List<User> guests;
 
     // Relación directa con Hotel
     @ManyToOne

@@ -31,7 +31,7 @@ public class RoomController {
 
     // ===== RUTAS ANIDADAS (Recomendadas para operaciones específicas de hotel) =====
     
-    @PostMapping("/hotels/{hotelId}/rooms")
+    @PostMapping("/api/v1/hotels/{hotelId}/rooms")
     public Room createRoomInHotel(@PathVariable UUID hotelId, @RequestBody RoomRequest roomRequest) {
         // Obtener el hotel real de la base de datos
         Hotel hotel = hotelService.getHotelById(hotelId);
@@ -48,12 +48,12 @@ public class RoomController {
         return roomService.createRoom(room);
     }
     
-    @GetMapping("/hotels/{hotelId}/rooms")
+    @GetMapping("/api/v1/hotels/{hotelId}/rooms")
     public List<Room> getRoomsByHotel(@PathVariable UUID hotelId) {
         return roomService.getRoomsByHotelId(hotelId);
     }
     
-    @GetMapping("/hotels/{hotelId}/rooms/{roomId}")
+    @GetMapping("/api/v1/hotels/{hotelId}/rooms/{roomId}")
     public Room getRoomInHotel(@PathVariable UUID hotelId, @PathVariable UUID roomId) {
         Room room = roomService.getRoomById(roomId);
         // Validar que la habitación pertenece al hotel y/o hotel no existe
@@ -63,7 +63,7 @@ public class RoomController {
         return room;
     }
     
-    @PutMapping("/hotels/{hotelId}/rooms/{roomId}")
+    @PutMapping("/api/v1/hotels/{hotelId}/rooms/{roomId}")
     public Room updateRoomInHotel(@PathVariable UUID hotelId, @PathVariable UUID roomId, @RequestBody Room room) {
         // Asegurar que la habitación sigue perteneciendo al hotel correcto
         if (room.getHotel() == null) {
@@ -73,7 +73,7 @@ public class RoomController {
         return roomService.updateRoom(roomId, room);
     }
     
-    @DeleteMapping("/hotels/{hotelId}/rooms/{roomId}")
+    @DeleteMapping("/api/v1/hotels/{hotelId}/rooms/{roomId}")
     public ResponseEntity<Void> deleteRoomFromHotel(@PathVariable UUID hotelId, @PathVariable UUID roomId) {
         Room room = roomService.getRoomById(roomId);
         // Validar que la habitación pertenece al hotel
@@ -86,18 +86,18 @@ public class RoomController {
 
     // ===== RUTAS GLOBALES (Para consultas generales) =====
     
-    @GetMapping("/rooms")
+    @GetMapping("/api/v1/rooms")
     public List<Room> getAllRooms() {
         return roomService.getAllRooms();
     }
     
-    @GetMapping("/rooms/{roomId}")
+    @GetMapping("/api/v1/rooms/{roomId}")
     public Room getRoomById(@PathVariable UUID roomId) {
         return roomService.getRoomById(roomId);
     }
 
     // Búsqueda con filtros múltiples usando query parameters
-    @GetMapping("/rooms/search")
+    @GetMapping("/api/v1/rooms/search")
     public List<Room> searchRooms(
             @RequestParam(required = false) String type,
             @RequestParam(required = false) Double price,
