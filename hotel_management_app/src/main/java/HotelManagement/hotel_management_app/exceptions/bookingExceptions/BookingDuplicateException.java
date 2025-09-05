@@ -1,4 +1,4 @@
-package HotelManagement.hotel_management_app.exceptions;
+package HotelManagement.hotel_management_app.exceptions.bookingExceptions;
 
 public class BookingDuplicateException extends RuntimeException {
     public BookingDuplicateException() {

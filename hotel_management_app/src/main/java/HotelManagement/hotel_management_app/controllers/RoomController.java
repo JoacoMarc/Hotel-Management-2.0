@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,8 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 import HotelManagement.hotel_management_app.entity.Room;
 import HotelManagement.hotel_management_app.entity.Hotel;
 import HotelManagement.hotel_management_app.entity.dto.RoomRequest;
-import HotelManagement.hotel_management_app.service.Room.RoomService;
-import HotelManagement.hotel_management_app.service.Hotel.HotelService;
+import HotelManagement.hotel_management_app.exceptions.roomExceptions.RoomBelongsToDifferentHotelException;
+import HotelManagement.hotel_management_app.service.hotel.HotelService;
+import HotelManagement.hotel_management_app.service.room.RoomService;
 
 @RestController
 public class RoomController {
@@ -58,12 +60,13 @@ public class RoomController {
         Room room = roomService.getRoomById(roomId);
         // Validar que la habitación pertenece al hotel y/o hotel no existe
         if (!room.getHotel().getId().equals(hotelId) || room.getHotel() == null) {
-            throw new RuntimeException("Room does not belong to this hotel or hotel does not exist");
+            throw new RoomBelongsToDifferentHotelException("La habitación no pertenece a este hotel o el hotel no existe");
         }
         return room;
     }
     
     @PutMapping("/api/v1/hotels/{hotelId}/rooms/{roomId}")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('HOTEL_MANAGER')")
     public Room updateRoomInHotel(@PathVariable UUID hotelId, @PathVariable UUID roomId, @RequestBody Room room) {
         // Asegurar que la habitación sigue perteneciendo al hotel correcto
         if (room.getHotel() == null) {
@@ -74,11 +77,12 @@ public class RoomController {
     }
     
     @DeleteMapping("/api/v1/hotels/{hotelId}/rooms/{roomId}")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('HOTEL_MANAGER')")
     public ResponseEntity<Void> deleteRoomFromHotel(@PathVariable UUID hotelId, @PathVariable UUID roomId) {
         Room room = roomService.getRoomById(roomId);
         // Validar que la habitación pertenece al hotel
         if (!room.getHotel().getId().equals(hotelId)) {
-            throw new RuntimeException("Room does not belong to this hotel");
+            throw new RoomBelongsToDifferentHotelException("La habitación no pertenece a este hotel");
         }
         roomService.deleteRoom(roomId);
         return ResponseEntity.noContent().build();
@@ -87,17 +91,20 @@ public class RoomController {
     // ===== RUTAS GLOBALES (Para consultas generales) =====
     
     @GetMapping("/api/v1/rooms")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public List<Room> getAllRooms() {
         return roomService.getAllRooms();
     }
     
     @GetMapping("/api/v1/rooms/{roomId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public Room getRoomById(@PathVariable UUID roomId) {
         return roomService.getRoomById(roomId);
     }
 
     // Búsqueda con filtros múltiples usando query parameters
     @GetMapping("/api/v1/rooms/search")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('GUEST')")
     public List<Room> searchRooms(
             @RequestParam(required = false) String type,
             @RequestParam(required = false) Double price,

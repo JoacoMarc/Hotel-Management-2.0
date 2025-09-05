@@ -1,4 +1,4 @@
-package HotelManagement.hotel_management_app.exceptions;
+package HotelManagement.hotel_management_app.exceptions.roomExceptions;
 
 public class RoomNotFoundException extends RuntimeException {
     public RoomNotFoundException() {

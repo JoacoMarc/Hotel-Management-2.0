@@ -1,4 +1,4 @@
-package HotelManagement.hotel_management_app.service.Room;
+package HotelManagement.hotel_management_app.service.room;
 
 import java.util.List;
 import java.util.UUID;
@@ -11,9 +11,10 @@ import HotelManagement.hotel_management_app.entity.Hotel;
 import HotelManagement.hotel_management_app.repository.RoomRepository;
 import HotelManagement.hotel_management_app.repository.HotelRepository;
 import HotelManagement.hotel_management_app.repository.BookingRepository;
-import HotelManagement.hotel_management_app.exceptions.RoomNotFoundException;
-import HotelManagement.hotel_management_app.exceptions.RoomDuplicateException;
-import HotelManagement.hotel_management_app.exceptions.HotelNotFoundException;
+import HotelManagement.hotel_management_app.exceptions.hotelExceptions.HotelNotFoundException;
+import HotelManagement.hotel_management_app.exceptions.roomExceptions.RoomDuplicateException;
+import HotelManagement.hotel_management_app.exceptions.roomExceptions.RoomHasActiveBookingsException;
+import HotelManagement.hotel_management_app.exceptions.roomExceptions.RoomNotFoundException;
 
 @Service
 public class RoomServiceImpl implements RoomService {
@@ -71,7 +72,7 @@ public class RoomServiceImpl implements RoomService {
         
         // Verificar si la habitación tiene reservas activas
         if (bookingRepository.findBookingsWithRoom(id).size() > 0) {
-            throw new IllegalStateException("Cannot delete room. It has associated bookings. Cancel all bookings first.");
+            throw new RoomHasActiveBookingsException("No se puede eliminar la habitación porque tiene reservas activas. Cancela todas las reservas primero.");
         }
         
         roomRepository.deleteById(id);

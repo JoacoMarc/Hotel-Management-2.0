@@ -1,4 +1,4 @@
-package HotelManagement.hotel_management_app.service.Booking;
+package HotelManagement.hotel_management_app.service.booking;
 
 import java.util.stream.Collectors;
 

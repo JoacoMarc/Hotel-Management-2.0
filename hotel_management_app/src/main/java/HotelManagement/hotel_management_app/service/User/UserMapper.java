@@ -1,4 +1,4 @@
-package HotelManagement.hotel_management_app.service.User;
+package HotelManagement.hotel_management_app.service.user;
 
 import org.springframework.stereotype.Component;
 

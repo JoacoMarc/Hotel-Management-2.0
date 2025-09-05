@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import HotelManagement.hotel_management_app.entity.Hotel;
-import HotelManagement.hotel_management_app.service.Hotel.HotelService;
+import HotelManagement.hotel_management_app.service.hotel.HotelService;
 
 @RestController
 @RequestMapping("/api/v1/hotels")

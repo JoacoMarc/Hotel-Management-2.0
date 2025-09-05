@@ -1,4 +1,4 @@
-package HotelManagement.hotel_management_app.service.User;
+package HotelManagement.hotel_management_app.service.user;
 
 import java.util.List;
 import java.util.UUID;
@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 
 import HotelManagement.hotel_management_app.entity.User;
 import HotelManagement.hotel_management_app.entity.UserRole;
+import HotelManagement.hotel_management_app.exceptions.userExceptions.UserNotFoundException;
 import HotelManagement.hotel_management_app.repository.UserRepository;
-import HotelManagement.hotel_management_app.exceptions.UserNotFoundException;
 
 @Service
 public class UserServiceImpl implements UserService {

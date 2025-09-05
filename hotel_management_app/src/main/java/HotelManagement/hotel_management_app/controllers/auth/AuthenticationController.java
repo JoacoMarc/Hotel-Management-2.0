@@ -35,10 +35,5 @@ public class AuthenticationController {
         return ResponseEntity.ok(service.authenticate(request));
     }
 
-    // Endpoint temporal para crear ADMIN (solo para setup inicial)
-    @PostMapping("/register/admin")
-    public ResponseEntity<AuthenticationResponse> registerAdmin(
-            @RequestBody EmployeeRegisterRequest request) {
-        return ResponseEntity.ok(service.registerAdmin(request));
-    }
+    
 }

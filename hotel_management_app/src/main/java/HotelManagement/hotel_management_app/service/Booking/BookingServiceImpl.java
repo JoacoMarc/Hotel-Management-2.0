@@ -1,4 +1,4 @@
-package HotelManagement.hotel_management_app.service.Booking;
+package HotelManagement.hotel_management_app.service.booking;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -18,12 +18,13 @@ import HotelManagement.hotel_management_app.entity.dto.BookingRequest;
 import HotelManagement.hotel_management_app.repository.BookingRepository;
 import HotelManagement.hotel_management_app.repository.UserRepository;
 import HotelManagement.hotel_management_app.repository.HotelRepository;
-import HotelManagement.hotel_management_app.service.User.UserService;
-import HotelManagement.hotel_management_app.service.Hotel.HotelService;
-import HotelManagement.hotel_management_app.service.Room.RoomService;
-import HotelManagement.hotel_management_app.exceptions.BookingNotFoundException;
-import HotelManagement.hotel_management_app.exceptions.BookingDuplicateException;
-import HotelManagement.hotel_management_app.exceptions.HotelNotFoundException;
+import HotelManagement.hotel_management_app.service.hotel.HotelService;
+import HotelManagement.hotel_management_app.service.room.RoomService;
+import HotelManagement.hotel_management_app.service.user.UserService;
+import HotelManagement.hotel_management_app.exceptions.bookingExceptions.BookingDuplicateException;
+import HotelManagement.hotel_management_app.exceptions.bookingExceptions.BookingNotFoundException;
+import HotelManagement.hotel_management_app.exceptions.bookingExceptions.InvalidBookingStatusException;
+import HotelManagement.hotel_management_app.exceptions.hotelExceptions.HotelNotFoundException;
 
 @Service
 public class BookingServiceImpl implements BookingService {
@@ -196,7 +197,7 @@ public class BookingServiceImpl implements BookingService {
             try {
                 bookingStatus = BookingStatus.valueOf(status.toUpperCase());
             } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Invalid booking status: " + status);
+                throw new InvalidBookingStatusException("Estado de reserva inválido: " + status);
             }
         }
         return bookingRepository.searchBookings(checkInDate, checkOutDate, bookingStatus, hotelId, guestId, roomId, minPrice, maxPrice, guestSurname, guestName, guestDocumentNumber);

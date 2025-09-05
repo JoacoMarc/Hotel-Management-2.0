@@ -16,11 +16,10 @@ import HotelManagement.hotel_management_app.controllers.config.JwtService;
 import HotelManagement.hotel_management_app.entity.Hotel;
 import HotelManagement.hotel_management_app.entity.User;
 import HotelManagement.hotel_management_app.entity.UserRole;
+import HotelManagement.hotel_management_app.exceptions.userExceptions.UserDuplicateException;
+import HotelManagement.hotel_management_app.exceptions.userExceptions.UserNotFoundException;
 import HotelManagement.hotel_management_app.repository.HotelRepository;
 import HotelManagement.hotel_management_app.repository.UserRepository;
-import HotelManagement.hotel_management_app.exceptions.UserDuplicateException;
-import HotelManagement.hotel_management_app.exceptions.UserNotFoundException;
-
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -97,30 +96,6 @@ public class AuthenticationService {
             .build();
     }
 
-    public AuthenticationResponse registerAdmin(EmployeeRegisterRequest request) {
-        // Verificar si el email ya existe
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new UserDuplicateException("Email ya registrado");
-        }
-
-        var admin = User.builder()
-            .name(request.getName())
-            .surname(request.getSurname())
-            .email(request.getEmail())
-            .password(passwordEncoder.encode(request.getPassword()))
-            .phone(request.getPhone())
-            .role(UserRole.ADMIN)
-            .employeeCode(request.getEmployeeCode())
-            .hireDate(LocalDate.now())
-            .hotel(null) // ADMIN no pertenece a un hotel específico
-            .build();
-            
-        userRepository.save(admin);
-        var jwtToken = jwtService.generateToken(admin);
-        return AuthenticationResponse.builder()
-            .accessToken(jwtToken)
-            .build();
-    }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         authenticationManager.authenticate(

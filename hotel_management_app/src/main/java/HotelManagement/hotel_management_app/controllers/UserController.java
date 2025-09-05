@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import HotelManagement.hotel_management_app.entity.User;
 import HotelManagement.hotel_management_app.entity.UserRole;
 import HotelManagement.hotel_management_app.entity.dto.UserResponse;
-import HotelManagement.hotel_management_app.service.User.UserService;
-import HotelManagement.hotel_management_app.service.User.UserMapper;
+import HotelManagement.hotel_management_app.service.user.UserMapper;
+import HotelManagement.hotel_management_app.service.user.UserService;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -60,7 +60,7 @@ public class UserController {
 
     // Obtener huéspedes (ADMIN o empleados del hotel)
     @GetMapping("/guests")
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('HOTEL_MANAGER') or hasAuthority('FRONT_DESK_MANAGER')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public List<UserResponse> getAllGuests() {
         List<User> guests = userService.getUsersByRole(UserRole.GUEST);
         return guests.stream()
@@ -70,6 +70,7 @@ public class UserController {
 
     // Actualizar usuario
     @PutMapping("/{userId}")
+    
     public UserResponse updateUser(@PathVariable UUID userId, @RequestBody User user) {
         User updatedUser = userService.updateUser(userId, user);
         return userMapper.toUserResponse(updatedUser);
