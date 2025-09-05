@@ -66,7 +66,6 @@ public class RoomController {
     }
     
     @PutMapping("/api/v1/hotels/{hotelId}/rooms/{roomId}")
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('HOTEL_MANAGER')")
     public Room updateRoomInHotel(@PathVariable UUID hotelId, @PathVariable UUID roomId, @RequestBody Room room) {
         // Asegurar que la habitación sigue perteneciendo al hotel correcto
         if (room.getHotel() == null) {
@@ -77,7 +76,6 @@ public class RoomController {
     }
     
     @DeleteMapping("/api/v1/hotels/{hotelId}/rooms/{roomId}")
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('HOTEL_MANAGER')")
     public ResponseEntity<Void> deleteRoomFromHotel(@PathVariable UUID hotelId, @PathVariable UUID roomId) {
         Room room = roomService.getRoomById(roomId);
         // Validar que la habitación pertenece al hotel
@@ -91,20 +89,17 @@ public class RoomController {
     // ===== RUTAS GLOBALES (Para consultas generales) =====
     
     @GetMapping("/api/v1/rooms")
-    @PreAuthorize("hasAuthority('ADMIN')")
     public List<Room> getAllRooms() {
         return roomService.getAllRooms();
     }
     
     @GetMapping("/api/v1/rooms/{roomId}")
-    @PreAuthorize("hasAuthority('ADMIN')")
     public Room getRoomById(@PathVariable UUID roomId) {
         return roomService.getRoomById(roomId);
     }
 
     // Búsqueda con filtros múltiples usando query parameters
     @GetMapping("/api/v1/rooms/search")
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('GUEST')")
     public List<Room> searchRooms(
             @RequestParam(required = false) String type,
             @RequestParam(required = false) Double price,

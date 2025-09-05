@@ -33,7 +33,6 @@ public class UserController {
 
     // Obtener todos los usuarios (solo ADMIN)
     @GetMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
     public List<UserResponse> getAllUsers() {
         List<User> users = userService.getAllUsers();
         return users.stream()
@@ -50,7 +49,6 @@ public class UserController {
 
     // Obtener empleados por hotel (HOTEL_MANAGER o ADMIN)
     @GetMapping("/employees/hotel/{hotelId}")
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('HOTEL_MANAGER')")
     public List<UserResponse> getEmployeesByHotel(@PathVariable UUID hotelId) {
         List<User> employees = userService.getEmployeesByHotel(hotelId);
         return employees.stream()
@@ -60,7 +58,6 @@ public class UserController {
 
     // Obtener huéspedes (ADMIN o empleados del hotel)
     @GetMapping("/guests")
-    @PreAuthorize("hasAuthority('ADMIN')")
     public List<UserResponse> getAllGuests() {
         List<User> guests = userService.getUsersByRole(UserRole.GUEST);
         return guests.stream()
@@ -70,7 +67,6 @@ public class UserController {
 
     // Actualizar usuario
     @PutMapping("/{userId}")
-    
     public UserResponse updateUser(@PathVariable UUID userId, @RequestBody User user) {
         User updatedUser = userService.updateUser(userId, user);
         return userMapper.toUserResponse(updatedUser);
@@ -78,7 +74,6 @@ public class UserController {
 
     // Eliminar usuario (solo ADMIN)
     @DeleteMapping("/{userId}")
-    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
         userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
