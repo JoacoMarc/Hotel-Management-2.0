@@ -17,11 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 import HotelManagement.hotel_management_app.entity.Booking;
 import HotelManagement.hotel_management_app.entity.dto.BookingRequest;
 import HotelManagement.hotel_management_app.entity.dto.BookingResponse;
-import HotelManagement.hotel_management_app.service.booking.BookingMapper;
-import HotelManagement.hotel_management_app.service.booking.BookingService;
-
+import HotelManagement.hotel_management_app.service.Booking.BookingService;
 import java.time.LocalDate;
 import java.util.stream.Collectors;
+import HotelManagement.hotel_management_app.service.Booking.BookingMapper;
 
 @RestController
 @RequestMapping("/api/v1/bookings")

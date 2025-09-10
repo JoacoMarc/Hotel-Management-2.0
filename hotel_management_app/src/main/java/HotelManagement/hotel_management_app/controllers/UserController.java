@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import HotelManagement.hotel_management_app.entity.User;
 import HotelManagement.hotel_management_app.entity.UserRole;
 import HotelManagement.hotel_management_app.entity.dto.UserResponse;
-import HotelManagement.hotel_management_app.service.user.UserMapper;
-import HotelManagement.hotel_management_app.service.user.UserService;
+import HotelManagement.hotel_management_app.service.User.UserMapper;
+import HotelManagement.hotel_management_app.service.User.UserService;
 
 @RestController
 @RequestMapping("/api/v1/users")

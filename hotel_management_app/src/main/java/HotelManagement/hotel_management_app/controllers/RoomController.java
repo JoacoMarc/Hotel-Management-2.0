@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,8 +20,8 @@ import HotelManagement.hotel_management_app.entity.Room;
 import HotelManagement.hotel_management_app.entity.Hotel;
 import HotelManagement.hotel_management_app.entity.dto.RoomRequest;
 import HotelManagement.hotel_management_app.exceptions.roomExceptions.RoomBelongsToDifferentHotelException;
-import HotelManagement.hotel_management_app.service.hotel.HotelService;
-import HotelManagement.hotel_management_app.service.room.RoomService;
+import HotelManagement.hotel_management_app.service.Room.RoomService;
+import HotelManagement.hotel_management_app.service.Hotel.HotelService;
 
 @RestController
 public class RoomController {

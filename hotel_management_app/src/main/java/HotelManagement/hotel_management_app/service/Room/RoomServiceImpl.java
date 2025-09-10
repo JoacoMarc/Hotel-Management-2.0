@@ -1,4 +1,4 @@
-package HotelManagement.hotel_management_app.service.room;
+package HotelManagement.hotel_management_app.service.Room;
 
 import java.util.List;
 import java.util.UUID;

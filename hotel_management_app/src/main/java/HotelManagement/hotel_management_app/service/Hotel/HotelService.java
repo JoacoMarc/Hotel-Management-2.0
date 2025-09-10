@@ -1,10 +1,10 @@
-package HotelManagement.hotel_management_app.service.hotel;
+package HotelManagement.hotel_management_app.service.Hotel;
 
 import java.util.List;
 import java.util.UUID;
 
 import HotelManagement.hotel_management_app.entity.Hotel;
-import HotelManagement.hotel_management_app.entity.Room;
+
 
 public interface HotelService {
     List<Hotel> getAllHotels();

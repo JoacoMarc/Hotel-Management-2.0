@@ -1,4 +1,5 @@
-package HotelManagement.hotel_management_app.service.booking;
+package HotelManagement.hotel_management_app.service.Booking;
+
 
 import java.time.LocalDate;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
 import HotelManagement.hotel_management_app.entity.Booking;
 import HotelManagement.hotel_management_app.entity.User;
 import HotelManagement.hotel_management_app.entity.Hotel;
@@ -18,9 +20,9 @@ import HotelManagement.hotel_management_app.entity.dto.BookingRequest;
 import HotelManagement.hotel_management_app.repository.BookingRepository;
 import HotelManagement.hotel_management_app.repository.UserRepository;
 import HotelManagement.hotel_management_app.repository.HotelRepository;
-import HotelManagement.hotel_management_app.service.hotel.HotelService;
-import HotelManagement.hotel_management_app.service.room.RoomService;
-import HotelManagement.hotel_management_app.service.user.UserService;
+import HotelManagement.hotel_management_app.service.Hotel.HotelService;
+import HotelManagement.hotel_management_app.service.Room.RoomService;
+import HotelManagement.hotel_management_app.service.User.UserService;
 import HotelManagement.hotel_management_app.exceptions.bookingExceptions.BookingDuplicateException;
 import HotelManagement.hotel_management_app.exceptions.bookingExceptions.BookingNotFoundException;
 import HotelManagement.hotel_management_app.exceptions.bookingExceptions.InvalidBookingStatusException;
