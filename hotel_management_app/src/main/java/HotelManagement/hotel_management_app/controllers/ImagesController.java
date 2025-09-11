@@ -1,7 +1,7 @@
-package HotelManagement.hotel_management_app.controllers.img;
+package HotelManagement.hotel_management_app.controllers;
 
 import HotelManagement.hotel_management_app.entity.Image;
-import HotelManagement.hotel_management_app.entity.dto.ImageResponse;
+import HotelManagement.hotel_management_app.entity.dto.imgDTO.ImageResponse;
 import HotelManagement.hotel_management_app.service.Img.ImageService;
 
 import org.springframework.web.bind.annotation.RestController;
@@ -79,6 +79,8 @@ public class ImagesController {
             return ResponseEntity.badRequest().body("Error setting image as primary: " + e.getMessage());
         }
     }
+
+
 
     // Eliminar imagen
     @DeleteMapping("/{id}")

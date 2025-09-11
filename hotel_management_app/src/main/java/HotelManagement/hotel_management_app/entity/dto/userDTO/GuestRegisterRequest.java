@@ -1,6 +1,6 @@
-package HotelManagement.hotel_management_app.controllers.auth;
+package HotelManagement.hotel_management_app.entity.dto.userDTO;
 
-import HotelManagement.hotel_management_app.entity.UserRole;
+import java.time.LocalDate;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,14 +11,15 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class EmployeeRegisterRequest {
+public class GuestRegisterRequest {
 
     private String name;
     private String surname;
     private String email;
     private String password;
     private String phone;
-    private String employeeCode;
-    private String hotelId; // UUID del hotel
-    private UserRole role;
+    private String documentType; // DNI, Pasaporte, etc.
+    private String documentNumber;
+    private String nationality;
+    private LocalDate birthDate;
 }

@@ -1,9 +1,9 @@
-package HotelManagement.hotel_management_app.service.User;
+package HotelManagement.hotel_management_app.service.user;
 
 import org.springframework.stereotype.Component;
 
 import HotelManagement.hotel_management_app.entity.User;
-import HotelManagement.hotel_management_app.entity.dto.UserResponse;
+import HotelManagement.hotel_management_app.entity.dto.userDTO.UserResponse;
 
 @Component
 public class UserMapper {

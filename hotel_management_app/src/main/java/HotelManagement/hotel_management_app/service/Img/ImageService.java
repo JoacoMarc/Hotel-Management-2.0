@@ -3,8 +3,8 @@ package HotelManagement.hotel_management_app.service.Img;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import HotelManagement.hotel_management_app.entity.Image;
-import HotelManagement.hotel_management_app.entity.dto.ImageRequest;
-import HotelManagement.hotel_management_app.entity.dto.ImageResponse;
+import HotelManagement.hotel_management_app.entity.dto.imgDTO.ImageRequest;
+import HotelManagement.hotel_management_app.entity.dto.imgDTO.ImageResponse;
 
 import java.util.List;
 import java.util.UUID;

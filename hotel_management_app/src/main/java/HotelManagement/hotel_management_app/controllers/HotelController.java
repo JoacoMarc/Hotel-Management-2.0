@@ -20,9 +20,9 @@ import org.springframework.web.multipart.MultipartFile;
 import HotelManagement.hotel_management_app.entity.Hotel;
 import HotelManagement.hotel_management_app.entity.Image;
 import HotelManagement.hotel_management_app.entity.Image;
-import HotelManagement.hotel_management_app.entity.dto.HotelResponse;
-import HotelManagement.hotel_management_app.entity.dto.ImageResponse;
-import HotelManagement.hotel_management_app.service.Hotel.HotelService;
+import HotelManagement.hotel_management_app.entity.dto.hotelDTO.HotelResponse;
+import HotelManagement.hotel_management_app.entity.dto.imgDTO.ImageResponse;
+import HotelManagement.hotel_management_app.service.hotel.HotelService;
 import HotelManagement.hotel_management_app.service.Img.ImageService;
 
 
@@ -93,8 +93,9 @@ public class HotelController {
         }
         return ResponseEntity.notFound().build();
     }
+
+
     
-    // === ENDPOINTS PARA IMÁGENES DE HOTELES ===
     
     // Subir imagen para un hotel
     @PostMapping("/{hotelId}/images")

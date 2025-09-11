@@ -1,10 +1,10 @@
-package HotelManagement.hotel_management_app.service.Room;
+package HotelManagement.hotel_management_app.service.room;
 
 import java.util.List;
 import java.util.UUID;
 
 import HotelManagement.hotel_management_app.entity.Room;
-import HotelManagement.hotel_management_app.entity.dto.RoomResponse;
+import HotelManagement.hotel_management_app.entity.dto.roomDTO.RoomResponse;
 
 public interface RoomService {
     // Métodos originales

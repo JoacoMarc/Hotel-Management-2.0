@@ -1,4 +1,4 @@
-package HotelManagement.hotel_management_app.service.Booking;
+package HotelManagement.hotel_management_app.service.booking;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import HotelManagement.hotel_management_app.entity.Booking;
 import HotelManagement.hotel_management_app.entity.User;
-import HotelManagement.hotel_management_app.entity.dto.BookingRequest;
+import HotelManagement.hotel_management_app.entity.dto.bookingDTO.BookingRequest;
 
 public interface BookingService {
     

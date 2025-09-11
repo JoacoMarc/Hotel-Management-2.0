@@ -1,4 +1,4 @@
-package HotelManagement.hotel_management_app.service.Booking;
+package HotelManagement.hotel_management_app.service.booking;
 
 import java.util.stream.Collectors;
 
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import HotelManagement.hotel_management_app.entity.Booking;
 import HotelManagement.hotel_management_app.entity.Room;
 import HotelManagement.hotel_management_app.entity.User;
-import HotelManagement.hotel_management_app.entity.dto.BookingResponse;
+import HotelManagement.hotel_management_app.entity.dto.bookingDTO.BookingResponse;
 
 @Component
 public class BookingMapper {

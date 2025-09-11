@@ -1,4 +1,4 @@
-package HotelManagement.hotel_management_app.entity.dto;
+package HotelManagement.hotel_management_app.entity.dto.userDTO;
 
 import java.time.LocalDate;
 import java.util.UUID;

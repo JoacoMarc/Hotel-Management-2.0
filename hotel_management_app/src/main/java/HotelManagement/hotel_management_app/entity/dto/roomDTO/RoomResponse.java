@@ -1,6 +1,8 @@
-package HotelManagement.hotel_management_app.entity.dto;
+package HotelManagement.hotel_management_app.entity.dto.roomDTO;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+
+import HotelManagement.hotel_management_app.entity.dto.imgDTO.ImageResponse;
 import lombok.Data;
 import lombok.Builder;
 import lombok.NoArgsConstructor;

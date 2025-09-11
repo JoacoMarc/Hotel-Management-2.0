@@ -1,10 +1,10 @@
-package HotelManagement.hotel_management_app.service.Hotel;
+package HotelManagement.hotel_management_app.service.hotel;
 
 import java.util.List;
 import java.util.UUID;
 
 import HotelManagement.hotel_management_app.entity.Hotel;
-import HotelManagement.hotel_management_app.entity.dto.HotelResponse;
+import HotelManagement.hotel_management_app.entity.dto.hotelDTO.HotelResponse;
 
 
 public interface HotelService {

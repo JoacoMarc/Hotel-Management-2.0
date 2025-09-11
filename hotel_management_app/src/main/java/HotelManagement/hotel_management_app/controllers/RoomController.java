@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import org.springframework.web.bind.annotation.RestController;
@@ -21,15 +22,17 @@ import org.springframework.web.multipart.MultipartFile;
 import HotelManagement.hotel_management_app.entity.Room;
 import HotelManagement.hotel_management_app.entity.Hotel;
 import HotelManagement.hotel_management_app.entity.Image;
-import HotelManagement.hotel_management_app.entity.dto.RoomRequest;
-import HotelManagement.hotel_management_app.entity.dto.RoomResponse;
-import HotelManagement.hotel_management_app.entity.dto.ImageResponse;
+import HotelManagement.hotel_management_app.entity.dto.imgDTO.ImageResponse;
+import HotelManagement.hotel_management_app.entity.dto.roomDTO.RoomRequest;
+import HotelManagement.hotel_management_app.entity.dto.roomDTO.RoomResponse;
 import HotelManagement.hotel_management_app.exceptions.roomExceptions.RoomBelongsToDifferentHotelException;
-import HotelManagement.hotel_management_app.service.Room.RoomService;
-import HotelManagement.hotel_management_app.service.Hotel.HotelService;
+import HotelManagement.hotel_management_app.exceptions.imageExceptions.*;
+import HotelManagement.hotel_management_app.service.room.RoomService;
+import HotelManagement.hotel_management_app.service.hotel.HotelService;
 import HotelManagement.hotel_management_app.service.Img.ImageService;
 
 @RestController
+
 public class RoomController {
     @Autowired
     private RoomService roomService;
@@ -42,7 +45,7 @@ public class RoomController {
 
     // ===== RUTAS ANIDADAS (Recomendadas para operaciones específicas de hotel) =====
     
-    @PostMapping("/api/v1/hotels/{hotelId}/rooms")
+    @PostMapping ("/api/v1/hotels/{hotelId}/rooms")
     public Room createRoomInHotel(@PathVariable UUID hotelId, @RequestBody RoomRequest roomRequest) {
         // Obtener el hotel real de la base de datos
         Hotel hotel = hotelService.getHotelById(hotelId);
@@ -59,12 +62,12 @@ public class RoomController {
         return roomService.createRoom(room);
     }
     
-    @GetMapping("/api/v1/hotels/{hotelId}/rooms")
+    @GetMapping ("/api/v1/hotels/{hotelId}/rooms")
     public List<RoomResponse> getRoomsByHotel(@PathVariable UUID hotelId) {
         return roomService.getRoomsByHotelIdWithImages(hotelId);
     }
     
-    @GetMapping("/api/v1/hotels/{hotelId}/rooms/{roomId}")
+    @GetMapping ("/api/v1/hotels/{hotelId}/rooms/{roomId}")
     public RoomResponse getRoomInHotel(@PathVariable UUID hotelId, @PathVariable UUID roomId) {
         Room room = roomService.getRoomById(roomId);
         // Validar que la habitación pertenece al hotel y/o hotel no existe
@@ -74,7 +77,7 @@ public class RoomController {
         return roomService.convertToResponseWithImages(room);
     }
     
-    @PutMapping("/api/v1/hotels/{hotelId}/rooms/{roomId}")
+    @PutMapping ("/api/v1/hotels/{hotelId}/rooms/{roomId}")
     public Room updateRoomInHotel(@PathVariable UUID hotelId, @PathVariable UUID roomId, @RequestBody Room room) {
         // Asegurar que la habitación sigue perteneciendo al hotel correcto
         if (room.getHotel() == null) {
@@ -84,7 +87,7 @@ public class RoomController {
         return roomService.updateRoom(roomId, room);
     }
     
-    @DeleteMapping("/api/v1/hotels/{hotelId}/rooms/{roomId}")
+    @DeleteMapping ("/api/v1/hotels/{hotelId}/rooms/{roomId}")
     public ResponseEntity<Void> deleteRoomFromHotel(@PathVariable UUID hotelId, @PathVariable UUID roomId) {
         Room room = roomService.getRoomById(roomId);
         // Validar que la habitación pertenece al hotel
@@ -97,7 +100,7 @@ public class RoomController {
 
     // ===== RUTAS GLOBALES (Para consultas generales) =====
     
-    @GetMapping("/api/v1/rooms")
+    @GetMapping ("/api/v1/rooms")
     public List<RoomResponse> getAllRooms() {
         return roomService.getAllRoomsWithImages();
     }
@@ -125,14 +128,26 @@ public class RoomController {
     }
 
     // Métodos para manejo de imágenes de habitaciones
-    @GetMapping("/api/v1/rooms/{roomId}/images")
-    public ResponseEntity<List<ImageResponse>> getRoomImages(@PathVariable UUID roomId) {
+    @GetMapping("/{roomId}/images")
+    public ResponseEntity<List<ImageResponse>> getRoomImages(@PathVariable UUID hotelId, @PathVariable UUID roomId) {
+        // Validar que la habitación pertenece al hotel
+        Room room = roomService.getRoomById(roomId);
+        if (!room.getHotel().getId().equals(hotelId)) {
+            throw new RoomBelongsToDifferentHotelException("La habitación no pertenece a este hotel");
+        }
+        
         List<ImageResponse> images = imageService.getImageResponsesByRoomId(roomId);
         return ResponseEntity.ok(images);
     }
 
-    @GetMapping("/api/v1/rooms/{roomId}/images/primary")
-    public ResponseEntity<ImageResponse> getRoomPrimaryImage(@PathVariable UUID roomId) {
+    @GetMapping("/{roomId}/images/primary")
+    public ResponseEntity<ImageResponse> getRoomPrimaryImage(@PathVariable UUID hotelId, @PathVariable UUID roomId) {
+        // Validar que la habitación pertenece al hotel
+        Room room = roomService.getRoomById(roomId);
+        if (!room.getHotel().getId().equals(hotelId)) {
+            throw new RoomBelongsToDifferentHotelException("La habitación no pertenece a este hotel");
+        }
+        
         ImageResponse primaryImage = imageService.getPrimaryImageResponseByRoomId(roomId);
         if (primaryImage != null) {
             return ResponseEntity.ok(primaryImage);
@@ -141,18 +156,34 @@ public class RoomController {
     }
     
     // Subir imagen para una habitación
-    @PostMapping("/api/v1/rooms/{roomId}/images")
+    @PostMapping("/{roomId}/images")
     public ResponseEntity<ImageResponse> uploadImageForRoom(
+            @PathVariable UUID hotelId,
             @PathVariable UUID roomId,
             @RequestParam("file") MultipartFile file,
-            @RequestParam(value = "imageName", required = false) String imageName,
-            @RequestParam(value = "isPrimary", defaultValue = "false") Boolean isPrimary) {
+            @RequestParam(value = "image_name", required = false) String imageName,
+            @RequestParam(value = "is_primary", defaultValue = "false") Boolean isPrimary) {
+        
+        // Validar que la habitación pertenece al hotel
+        Room room = roomService.getRoomById(roomId);
+        if (!room.getHotel().getId().equals(hotelId)) {
+            throw new RoomBelongsToDifferentHotelException("La habitación no pertenece a este hotel");
+        }
+        
+        Image savedImage = imageService.uploadImageForRoom(roomId, file, imageName, isPrimary);
+        ImageResponse imageDto = imageService.convertToResponse(savedImage);
+        return ResponseEntity.status(HttpStatus.CREATED).body(imageDto);
+    }
+    
+    @PutMapping("/api/v1/rooms/{roomId}/images/{imageId}/set-primary")
+    public ResponseEntity<String> setPrimaryImageForRoom(
+            @PathVariable UUID roomId,
+            @PathVariable UUID imageId) {
         try {
-            Image savedImage = imageService.uploadImageForRoom(roomId, file, imageName, isPrimary);
-            ImageResponse imageDto = imageService.convertToResponse(savedImage);
-            return ResponseEntity.status(HttpStatus.CREATED).body(imageDto);
+            imageService.setPrimaryImage(imageId, null, roomId);
+            return ResponseEntity.ok("Image set as primary successfully");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body("Error setting image as primary: " + e.getMessage());
         }
     }
 }

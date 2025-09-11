@@ -1,4 +1,4 @@
-package HotelManagement.hotel_management_app.entity.dto;
+package HotelManagement.hotel_management_app.entity.dto.imgDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.Data;

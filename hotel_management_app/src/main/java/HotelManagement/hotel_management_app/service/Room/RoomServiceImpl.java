@@ -1,4 +1,4 @@
-package HotelManagement.hotel_management_app.service.Room;
+package HotelManagement.hotel_management_app.service.room;
 
 import java.util.List;
 import java.util.UUID;
@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 
 import HotelManagement.hotel_management_app.entity.Room;
 import HotelManagement.hotel_management_app.entity.Hotel;
-import HotelManagement.hotel_management_app.entity.dto.RoomResponse;
-import HotelManagement.hotel_management_app.entity.dto.ImageResponse;
+import HotelManagement.hotel_management_app.entity.dto.imgDTO.ImageResponse;
+import HotelManagement.hotel_management_app.entity.dto.roomDTO.RoomResponse;
 import HotelManagement.hotel_management_app.repository.RoomRepository;
 import HotelManagement.hotel_management_app.repository.HotelRepository;
 import HotelManagement.hotel_management_app.repository.BookingRepository;
@@ -135,6 +135,8 @@ public class RoomServiceImpl implements RoomService {
         List<ImageResponse> images = imageService.getImageResponsesByRoomId(room.getId());
         ImageResponse primaryImage = imageService.getPrimaryImageResponseByRoomId(room.getId());
         String primaryImageUrl = primaryImage != null ? "/api/v1/images/" + primaryImage.getId() : null;
+        
+         // Construir y retornar el RoomResponse
         
         return RoomResponse.builder()
                 .id(room.getId())

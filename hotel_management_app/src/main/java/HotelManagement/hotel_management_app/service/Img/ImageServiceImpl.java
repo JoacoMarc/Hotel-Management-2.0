@@ -3,13 +3,18 @@ package HotelManagement.hotel_management_app.service.Img;
 import HotelManagement.hotel_management_app.entity.Image;
 import HotelManagement.hotel_management_app.entity.Hotel;
 import HotelManagement.hotel_management_app.entity.Room;
-import HotelManagement.hotel_management_app.entity.dto.ImageRequest;
-import HotelManagement.hotel_management_app.entity.dto.ImageResponse;
+import HotelManagement.hotel_management_app.entity.dto.imgDTO.ImageRequest;
+import HotelManagement.hotel_management_app.entity.dto.imgDTO.ImageResponse;
 import HotelManagement.hotel_management_app.repository.ImageRepository;
 import HotelManagement.hotel_management_app.repository.HotelRepository;
 import HotelManagement.hotel_management_app.repository.RoomRepository;
 import HotelManagement.hotel_management_app.exceptions.hotelExceptions.HotelNotFoundException;
 import HotelManagement.hotel_management_app.exceptions.roomExceptions.RoomNotFoundException;
+import HotelManagement.hotel_management_app.exceptions.imageExceptions.ImageNotFoundException;
+import HotelManagement.hotel_management_app.exceptions.imageExceptions.ImageUploadException;
+import HotelManagement.hotel_management_app.exceptions.imageExceptions.ImageStorageException;
+import HotelManagement.hotel_management_app.exceptions.imageExceptions.EmptyImageFileException;
+import HotelManagement.hotel_management_app.exceptions.imageExceptions.InvalidImageTypeException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,7 +52,7 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public Image viewById(UUID id) {
         return imageRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Image not found with id: " + id));
+                .orElseThrow(() -> new ImageNotFoundException("Imagen no encontrada con id: " + id));
     }
 
     @Override
@@ -63,6 +68,17 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public Image uploadImageForHotel(UUID hotelId, MultipartFile file, String imageName, Boolean isPrimary) {
         try {
+            // Validar archivo
+            if (file == null || file.isEmpty()) {
+                throw new EmptyImageFileException("El archivo de imagen está vacío o es nulo");
+            }
+            
+            // Validar tipo de archivo
+            String contentType = file.getContentType();
+            if (contentType == null || !contentType.startsWith("image/")) {
+                throw new InvalidImageTypeException("El tipo de archivo no es válido. Solo se permiten imágenes");
+            }
+
             Hotel hotel = hotelRepository.findById(hotelId)
                     .orElseThrow(() -> new HotelNotFoundException("Hotel not found with id: " + hotelId));
 
@@ -86,8 +102,10 @@ public class ImageServiceImpl implements ImageService {
                     .build();
 
             return imageRepository.save(image);
-        } catch (IOException | SQLException e) {
-            throw new RuntimeException("Error uploading image for hotel: " + e.getMessage());
+        } catch (IOException e) {
+            throw new ImageUploadException("Error al leer el archivo de imagen: " + e.getMessage(), e);
+        } catch (SQLException e) {
+            throw new ImageStorageException("Error al almacenar la imagen en la base de datos: " + e.getMessage(), e);
         }
     }
 
@@ -113,6 +131,17 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public Image uploadImageForRoom(UUID roomId, MultipartFile file, String imageName, Boolean isPrimary) {
         try {
+            // Validar archivo
+            if (file == null || file.isEmpty()) {
+                throw new EmptyImageFileException("El archivo de imagen está vacío o es nulo");
+            }
+            
+            // Validar tipo de archivo
+            String contentType = file.getContentType();
+            if (contentType == null || !contentType.startsWith("image/")) {
+                throw new InvalidImageTypeException("El tipo de archivo no es válido. Solo se permiten imágenes");
+            }
+
             Room room = roomRepository.findById(roomId)
                     .orElseThrow(() -> new RoomNotFoundException("Room not found with id: " + roomId));
 
@@ -136,8 +165,10 @@ public class ImageServiceImpl implements ImageService {
                     .build();
 
             return imageRepository.save(image);
-        } catch (IOException | SQLException e) {
-            throw new RuntimeException("Error uploading image for room: " + e.getMessage());
+        } catch (IOException e) {
+            throw new ImageUploadException("Error al leer el archivo de imagen: " + e.getMessage(), e);
+        } catch (SQLException e) {
+            throw new ImageStorageException("Error al almacenar la imagen en la base de datos: " + e.getMessage(), e);
         }
     }
 
@@ -180,7 +211,7 @@ public class ImageServiceImpl implements ImageService {
             Blob blob = image.getImage();
             return blob.getBytes(1, (int) blob.length());
         } catch (SQLException e) {
-            throw new RuntimeException("Error retrieving image data: " + e.getMessage());
+            throw new ImageStorageException("Error al recuperar los datos de la imagen: " + e.getMessage(), e);
         }
     }
 
@@ -237,7 +268,7 @@ public class ImageServiceImpl implements ImageService {
                     .file(encodedString) // Campo legacy
                     .build();
         } catch (Exception e) {
-            throw new RuntimeException("Error getting image with base64: " + e.getMessage());
+            throw new ImageStorageException("Error al obtener la imagen codificada en base64: " + e.getMessage(), e);
         }
     }
     

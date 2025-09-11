@@ -1,4 +1,4 @@
-package HotelManagement.hotel_management_app.service.Hotel;
+package HotelManagement.hotel_management_app.service.hotel;
 
 import java.util.List;
 import java.util.UUID;
@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 
 import HotelManagement.hotel_management_app.entity.Hotel;
 import HotelManagement.hotel_management_app.entity.Room;
-import HotelManagement.hotel_management_app.entity.dto.HotelResponse;
-import HotelManagement.hotel_management_app.entity.dto.ImageResponse;
+import HotelManagement.hotel_management_app.entity.dto.hotelDTO.HotelResponse;
+import HotelManagement.hotel_management_app.entity.dto.imgDTO.ImageResponse;
 import HotelManagement.hotel_management_app.exceptions.hotelExceptions.HotelDuplicateException;
 import HotelManagement.hotel_management_app.exceptions.hotelExceptions.HotelNotFoundException;
 import HotelManagement.hotel_management_app.repository.HotelRepository;

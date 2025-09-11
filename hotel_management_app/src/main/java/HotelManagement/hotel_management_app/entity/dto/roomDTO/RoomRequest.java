@@ -1,4 +1,4 @@
-package HotelManagement.hotel_management_app.entity.dto;
+package HotelManagement.hotel_management_app.entity.dto.roomDTO;
 
 import java.util.UUID;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package HotelManagement.hotel_management_app.entity.dto;
+package HotelManagement.hotel_management_app.entity.dto.hotelDTO;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import com.fasterxml.jackson.annotation.JsonInclude;
+
+import HotelManagement.hotel_management_app.entity.dto.imgDTO.ImageResponse;
 
 @Data
 @Builder

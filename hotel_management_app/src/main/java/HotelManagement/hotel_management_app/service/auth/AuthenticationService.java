@@ -10,12 +10,12 @@ import org.springframework.stereotype.Service;
 
 import HotelManagement.hotel_management_app.controllers.auth.AuthenticationRequest;
 import HotelManagement.hotel_management_app.controllers.auth.AuthenticationResponse;
-import HotelManagement.hotel_management_app.controllers.auth.EmployeeRegisterRequest;
-import HotelManagement.hotel_management_app.controllers.auth.GuestRegisterRequest;
 import HotelManagement.hotel_management_app.controllers.config.JwtService;
 import HotelManagement.hotel_management_app.entity.Hotel;
 import HotelManagement.hotel_management_app.entity.User;
 import HotelManagement.hotel_management_app.entity.UserRole;
+import HotelManagement.hotel_management_app.entity.dto.userDTO.EmployeeRegisterRequest;
+import HotelManagement.hotel_management_app.entity.dto.userDTO.GuestRegisterRequest;
 import HotelManagement.hotel_management_app.exceptions.userExceptions.UserDuplicateException;
 import HotelManagement.hotel_management_app.exceptions.userExceptions.UserNotFoundException;
 import HotelManagement.hotel_management_app.repository.HotelRepository;
