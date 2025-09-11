@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,11 +16,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import HotelManagement.hotel_management_app.entity.Room;
 import HotelManagement.hotel_management_app.entity.Hotel;
+import HotelManagement.hotel_management_app.entity.Image;
 import HotelManagement.hotel_management_app.entity.dto.RoomRequest;
-import HotelManagement.hotel_management_app.entity.dto.ImageRequest;
+import HotelManagement.hotel_management_app.entity.dto.RoomResponse;
+import HotelManagement.hotel_management_app.entity.dto.ImageResponse;
 import HotelManagement.hotel_management_app.exceptions.roomExceptions.RoomBelongsToDifferentHotelException;
 import HotelManagement.hotel_management_app.service.Room.RoomService;
 import HotelManagement.hotel_management_app.service.Hotel.HotelService;
@@ -56,18 +60,18 @@ public class RoomController {
     }
     
     @GetMapping("/api/v1/hotels/{hotelId}/rooms")
-    public List<Room> getRoomsByHotel(@PathVariable UUID hotelId) {
-        return roomService.getRoomsByHotelId(hotelId);
+    public List<RoomResponse> getRoomsByHotel(@PathVariable UUID hotelId) {
+        return roomService.getRoomsByHotelIdWithImages(hotelId);
     }
     
     @GetMapping("/api/v1/hotels/{hotelId}/rooms/{roomId}")
-    public Room getRoomInHotel(@PathVariable UUID hotelId, @PathVariable UUID roomId) {
+    public RoomResponse getRoomInHotel(@PathVariable UUID hotelId, @PathVariable UUID roomId) {
         Room room = roomService.getRoomById(roomId);
         // Validar que la habitación pertenece al hotel y/o hotel no existe
         if (!room.getHotel().getId().equals(hotelId) || room.getHotel() == null) {
             throw new RoomBelongsToDifferentHotelException("La habitación no pertenece a este hotel o el hotel no existe");
         }
-        return room;
+        return roomService.convertToResponseWithImages(room);
     }
     
     @PutMapping("/api/v1/hotels/{hotelId}/rooms/{roomId}")
@@ -94,18 +98,18 @@ public class RoomController {
     // ===== RUTAS GLOBALES (Para consultas generales) =====
     
     @GetMapping("/api/v1/rooms")
-    public List<Room> getAllRooms() {
-        return roomService.getAllRooms();
+    public List<RoomResponse> getAllRooms() {
+        return roomService.getAllRoomsWithImages();
     }
     
     @GetMapping("/api/v1/rooms/{roomId}")
-    public Room getRoomById(@PathVariable UUID roomId) {
-        return roomService.getRoomById(roomId);
+    public RoomResponse getRoomById(@PathVariable UUID roomId) {
+        return roomService.getRoomByIdWithImages(roomId);
     }
 
     // Búsqueda con filtros múltiples usando query parameters
     @GetMapping("/api/v1/rooms/search")
-    public List<Room> searchRooms(
+    public List<RoomResponse> searchRooms(
             @RequestParam(required = false) String type,
             @RequestParam(required = false) Double price,
             @RequestParam(required = false) Integer capacity,
@@ -117,22 +121,38 @@ public class RoomController {
             @RequestParam(required = false) String hotelName,
             @RequestParam(required = false) String hotelCity,
             @RequestParam(required = false) String hotelCountry) {
-        return roomService.searchRooms(type, price, capacity, available, number, hotelId, minPrice, maxPrice, hotelName, hotelCity, hotelCountry);
+        return roomService.searchRoomsWithImages(type, price, capacity, available, number, hotelId, minPrice, maxPrice, hotelName, hotelCity, hotelCountry);
     }
 
     // Métodos para manejo de imágenes de habitaciones
     @GetMapping("/api/v1/rooms/{roomId}/images")
-    public ResponseEntity<List<ImageRequest>> getRoomImages(@PathVariable UUID roomId) {
-        List<ImageRequest> images = imageService.getImagesByRoomId(roomId);
+    public ResponseEntity<List<ImageResponse>> getRoomImages(@PathVariable UUID roomId) {
+        List<ImageResponse> images = imageService.getImageResponsesByRoomId(roomId);
         return ResponseEntity.ok(images);
     }
 
     @GetMapping("/api/v1/rooms/{roomId}/images/primary")
-    public ResponseEntity<ImageRequest> getRoomPrimaryImage(@PathVariable UUID roomId) {
-        ImageRequest primaryImage = imageService.getPrimaryImageByRoomId(roomId);
+    public ResponseEntity<ImageResponse> getRoomPrimaryImage(@PathVariable UUID roomId) {
+        ImageResponse primaryImage = imageService.getPrimaryImageResponseByRoomId(roomId);
         if (primaryImage != null) {
             return ResponseEntity.ok(primaryImage);
         }
         return ResponseEntity.notFound().build();
+    }
+    
+    // Subir imagen para una habitación
+    @PostMapping("/api/v1/rooms/{roomId}/images")
+    public ResponseEntity<ImageResponse> uploadImageForRoom(
+            @PathVariable UUID roomId,
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "imageName", required = false) String imageName,
+            @RequestParam(value = "isPrimary", defaultValue = "false") Boolean isPrimary) {
+        try {
+            Image savedImage = imageService.uploadImageForRoom(roomId, file, imageName, isPrimary);
+            ImageResponse imageDto = imageService.convertToResponse(savedImage);
+            return ResponseEntity.status(HttpStatus.CREATED).body(imageDto);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

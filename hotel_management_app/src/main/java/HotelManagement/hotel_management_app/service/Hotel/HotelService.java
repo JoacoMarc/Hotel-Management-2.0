@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import HotelManagement.hotel_management_app.entity.Hotel;
+import HotelManagement.hotel_management_app.entity.dto.HotelResponse;
 
 
 public interface HotelService {
@@ -14,4 +15,10 @@ public interface HotelService {
     void deleteHotel(UUID id);
     // Método de búsqueda de hoteles con múltiples filtros opcionales
     List<Hotel> searchHotels(String country, String city, String state, String type, String name, Integer minRating, Integer maxRating, String zipCode, String phone, String email);
+    
+    // Nuevos métodos para incluir imágenes
+    List<HotelResponse> getAllHotelsWithImages();
+    HotelResponse getHotelByIdWithImages(UUID hotelId);
+    List<HotelResponse> searchHotelsWithImages(String country, String city, String state, String type, String name, Integer minRating, Integer maxRating, String zipCode, String phone, String email);
+    HotelResponse convertToResponseWithImages(Hotel hotel);
 }

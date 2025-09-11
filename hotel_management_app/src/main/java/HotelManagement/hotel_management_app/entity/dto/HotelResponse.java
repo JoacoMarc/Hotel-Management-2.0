@@ -27,6 +27,13 @@ public class HotelResponse {
     private String state;
     private String zipCode;
     private String hotelType;
-    
-    
+    private String description;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private List<ImageResponse> images;
+    private ImageResponse primaryImage;
+    private String primaryImageUrl;
+    private Integer totalImages;
+    private Integer totalRooms;
+
 }

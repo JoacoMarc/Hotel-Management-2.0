@@ -22,12 +22,20 @@ public interface ImageService {
     List<ImageRequest> getImagesByHotelId(UUID hotelId);
     ImageRequest getPrimaryImageByHotelId(UUID hotelId);
     void deleteImagesByHotelId(UUID hotelId);
+    
+    // Métodos para hoteles que devuelven ImageResponse (para el frontend)
+    List<ImageResponse> getImageResponsesByHotelId(UUID hotelId);
+    ImageResponse getPrimaryImageResponseByHotelId(UUID hotelId);
 
     // Métodos para habitaciones
     Image uploadImageForRoom(UUID roomId, MultipartFile file, String imageName, Boolean isPrimary);
     List<ImageRequest> getImagesByRoomId(UUID roomId);
     ImageRequest getPrimaryImageByRoomId(UUID roomId);
     void deleteImagesByRoomId(UUID roomId);
+    
+    // Métodos para habitaciones que devuelven ImageResponse (para el frontend)
+    List<ImageResponse> getImageResponsesByRoomId(UUID roomId);
+    ImageResponse getPrimaryImageResponseByRoomId(UUID roomId);
 
     // Métodos de conversión y utilidad
     ImageRequest convertToDto(Image image);

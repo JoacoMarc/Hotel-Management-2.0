@@ -2,20 +2,27 @@ package HotelManagement.hotel_management_app.service.Hotel;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import HotelManagement.hotel_management_app.entity.Hotel;
 import HotelManagement.hotel_management_app.entity.Room;
+import HotelManagement.hotel_management_app.entity.dto.HotelResponse;
+import HotelManagement.hotel_management_app.entity.dto.ImageResponse;
 import HotelManagement.hotel_management_app.exceptions.hotelExceptions.HotelDuplicateException;
 import HotelManagement.hotel_management_app.exceptions.hotelExceptions.HotelNotFoundException;
 import HotelManagement.hotel_management_app.repository.HotelRepository;
+import HotelManagement.hotel_management_app.service.Img.ImageService;
 
 @Service
 public class HotelServiceImpl implements HotelService {
     @Autowired
     private HotelRepository hotelRepository;
+    
+    @Autowired
+    private ImageService imageService;
 
     public List<Hotel> getAllHotels() {
         return hotelRepository.findAll();
@@ -59,4 +66,65 @@ public class HotelServiceImpl implements HotelService {
     public List<Hotel> searchHotels(String country, String city, String state, String type, String name, Integer minRating, Integer maxRating, String zipCode, String phone, String email) {
         return hotelRepository.searchHotels(country, city, state, type, name, minRating, maxRating, zipCode, phone, email);
     }
+    
+    // Nuevos métodos para incluir imágenes
+    @Override
+    public List<HotelResponse> getAllHotelsWithImages() {
+        List<Hotel> hotels = hotelRepository.findAll();
+        return hotels.stream()
+                .map(this::convertToResponseWithImages)
+                .collect(Collectors.toList());
+    }
+    
+    @Override
+    public HotelResponse getHotelByIdWithImages(UUID hotelId) {
+        Hotel hotel = hotelRepository.findById(hotelId)
+                .orElseThrow(() -> new HotelNotFoundException());
+        return convertToResponseWithImages(hotel);
+    }
+    
+    @Override
+    public List<HotelResponse> searchHotelsWithImages(String country, String city, String state, String type, String name, Integer minRating, Integer maxRating, String zipCode, String phone, String email) {
+        List<Hotel> hotels = hotelRepository.searchHotels(country, city, state, type, name, minRating, maxRating, zipCode, phone, email);
+        return hotels.stream()
+                .map(this::convertToResponseWithImages)
+                .collect(Collectors.toList());
+    }
+    
+    @Override
+    public HotelResponse convertToResponseWithImages(Hotel hotel) {
+        // Obtener imágenes del hotel
+        List<ImageResponse> images = imageService.getImageResponsesByHotelId(hotel.getId());
+        ImageResponse primaryImage = imageService.getPrimaryImageResponseByHotelId(hotel.getId());
+        String primaryImageUrl = primaryImage != null ? "/api/v1/images/" + primaryImage.getId() : null;
+        
+        // Calcular campos adicionales (puedes personalizar según tus necesidades)
+        Integer totalRooms = hotel.getRooms() != null ? hotel.getRooms().size() : 0;
+        
+        
+        
+        return HotelResponse.builder()
+                .id(hotel.getId())
+                .name(hotel.getName())
+                .address(hotel.getAddress())
+                .phone(hotel.getPhone())
+                .email(hotel.getEmail())
+                .website(hotel.getWebsite())
+                .rating(hotel.getRating())
+                .country(hotel.getCountry())
+                .city(hotel.getCity())
+                .state(hotel.getState())
+                .zipCode(hotel.getZipCode())
+                .hotelType(hotel.getHotelType())
+                .images(images)
+                .primaryImage(primaryImage)
+                .primaryImageUrl(primaryImageUrl)
+                .totalImages(images != null ? images.size() : 0)
+                .totalRooms(totalRooms)
+                .build();
+    }
+    
+    
+    
+    
 }

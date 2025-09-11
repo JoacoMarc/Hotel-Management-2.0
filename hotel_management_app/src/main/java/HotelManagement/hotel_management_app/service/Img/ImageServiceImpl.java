@@ -240,4 +240,33 @@ public class ImageServiceImpl implements ImageService {
             throw new RuntimeException("Error getting image with base64: " + e.getMessage());
         }
     }
+    
+    // Nuevos métodos para devolver ImageResponse
+    @Override
+    public List<ImageResponse> getImageResponsesByHotelId(UUID hotelId) {
+        List<Image> images = imageRepository.findByHotelId(hotelId);
+        return images.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+    }
+    
+    @Override
+    public ImageResponse getPrimaryImageResponseByHotelId(UUID hotelId) {
+        Optional<Image> primaryImage = imageRepository.findPrimaryImageByHotelId(hotelId);
+        return primaryImage.map(this::convertToResponse).orElse(null);
+    }
+    
+    @Override
+    public List<ImageResponse> getImageResponsesByRoomId(UUID roomId) {
+        List<Image> images = imageRepository.findByRoomId(roomId);
+        return images.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+    }
+    
+    @Override
+    public ImageResponse getPrimaryImageResponseByRoomId(UUID roomId) {
+        Optional<Image> primaryImage = imageRepository.findPrimaryImageByRoomId(roomId);
+        return primaryImage.map(this::convertToResponse).orElse(null);
+    }
 }

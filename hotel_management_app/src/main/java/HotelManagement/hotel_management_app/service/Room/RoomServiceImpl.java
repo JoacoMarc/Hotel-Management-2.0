@@ -2,15 +2,19 @@ package HotelManagement.hotel_management_app.service.Room;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import HotelManagement.hotel_management_app.entity.Room;
 import HotelManagement.hotel_management_app.entity.Hotel;
+import HotelManagement.hotel_management_app.entity.dto.RoomResponse;
+import HotelManagement.hotel_management_app.entity.dto.ImageResponse;
 import HotelManagement.hotel_management_app.repository.RoomRepository;
 import HotelManagement.hotel_management_app.repository.HotelRepository;
 import HotelManagement.hotel_management_app.repository.BookingRepository;
+import HotelManagement.hotel_management_app.service.Img.ImageService;
 import HotelManagement.hotel_management_app.exceptions.hotelExceptions.HotelNotFoundException;
 import HotelManagement.hotel_management_app.exceptions.roomExceptions.RoomDuplicateException;
 import HotelManagement.hotel_management_app.exceptions.roomExceptions.RoomHasActiveBookingsException;
@@ -26,6 +30,9 @@ public class RoomServiceImpl implements RoomService {
     
     @Autowired
     private BookingRepository bookingRepository;
+    
+    @Autowired
+    private ImageService imageService;
 
     public List<Room> getAllRooms() {
         return roomRepository.findAll();
@@ -86,5 +93,62 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public List<Room> searchRooms(String type, Double price, Integer capacity, Boolean available, String number, UUID hotelId, Double minPrice, Double maxPrice, String hotelName, String hotelCity, String hotelCountry) {
         return roomRepository.searchRooms(type, price, capacity, available, number, hotelId, minPrice, maxPrice, hotelName, hotelCity, hotelCountry);
+    }
+    
+    // Nuevos métodos para incluir imágenes
+    @Override
+    public List<RoomResponse> getAllRoomsWithImages() {
+        List<Room> rooms = roomRepository.findAll();
+        return rooms.stream()
+                .map(this::convertToResponseWithImages)
+                .collect(Collectors.toList());
+    }
+    
+    @Override
+    public RoomResponse getRoomByIdWithImages(UUID id) {
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new RoomNotFoundException());
+        return convertToResponseWithImages(room);
+    }
+    
+    @Override
+    public List<RoomResponse> getRoomsByHotelIdWithImages(UUID hotelId) {
+        Hotel hotel = hotelRepository.findById(hotelId)
+                .orElseThrow(() -> new HotelNotFoundException());
+        List<Room> rooms = roomRepository.findByHotel(hotel);
+        return rooms.stream()
+                .map(this::convertToResponseWithImages)
+                .collect(Collectors.toList());
+    }
+    
+    @Override
+    public List<RoomResponse> searchRoomsWithImages(String type, Double price, Integer capacity, Boolean available, String number, UUID hotelId, Double minPrice, Double maxPrice, String hotelName, String hotelCity, String hotelCountry) {
+        List<Room> rooms = roomRepository.searchRooms(type, price, capacity, available, number, hotelId, minPrice, maxPrice, hotelName, hotelCity, hotelCountry);
+        return rooms.stream()
+                .map(this::convertToResponseWithImages)
+                .collect(Collectors.toList());
+    }
+    
+    @Override
+    public RoomResponse convertToResponseWithImages(Room room) {
+        // Obtener imágenes de la habitación
+        List<ImageResponse> images = imageService.getImageResponsesByRoomId(room.getId());
+        ImageResponse primaryImage = imageService.getPrimaryImageResponseByRoomId(room.getId());
+        String primaryImageUrl = primaryImage != null ? "/api/v1/images/" + primaryImage.getId() : null;
+        
+        return RoomResponse.builder()
+                .id(room.getId())
+                .roomNumber(room.getRoomNumber())
+                .roomType(room.getRoomType())
+                .roomPrice(room.getRoomPrice())
+                .roomCapacity(room.getRoomCapacity())
+                .roomAvailability(room.isRoomAvailability())
+                .hotelId(room.getHotel() != null ? room.getHotel().getId() : null)
+                .hotelName(room.getHotel() != null ? room.getHotel().getName() : null)
+                .images(images)
+                .primaryImage(primaryImage)
+                .primaryImageUrl(primaryImageUrl)
+                .totalImages(images != null ? images.size() : 0)
+                .build();
     }
 }

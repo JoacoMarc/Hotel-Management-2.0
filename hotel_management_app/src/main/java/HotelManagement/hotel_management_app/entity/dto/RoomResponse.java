@@ -24,5 +24,19 @@ public class RoomResponse {
     private double roomPrice;
     private int roomCapacity;
     private boolean roomAvailability;
+    private String description;
     
+    // Hotel Information
+    private UUID hotelId;
+    private String hotelName;
+    
+    // Timestamps
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    
+    // Image Information
+    private List<ImageResponse> images;
+    private ImageResponse primaryImage;
+    private String primaryImageUrl;
+    private Integer totalImages;
 }

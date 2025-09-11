@@ -1,21 +1,13 @@
 package HotelManagement.hotel_management_app.controllers.img;
 
 import HotelManagement.hotel_management_app.entity.Image;
-import HotelManagement.hotel_management_app.entity.dto.AddFileRequest;
-import HotelManagement.hotel_management_app.entity.dto.ImageRequest;
 import HotelManagement.hotel_management_app.entity.dto.ImageResponse;
 import HotelManagement.hotel_management_app.service.Img.ImageService;
 
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.sql.Blob;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
-
-import javax.sql.rowset.serial.SerialException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -72,77 +64,7 @@ public class ImagesController {
         }
     }
 
-    // === ENDPOINTS PARA HOTELES ===
-    
-    // Subir imagen para un hotel
-    @PostMapping("/hotels/{hotelId}")
-    public ResponseEntity<ImageRequest> uploadImageForHotel(
-            @PathVariable UUID hotelId,
-            @RequestParam("file") MultipartFile file,
-            @RequestParam(value = "imageName", required = false) String imageName,
-            @RequestParam(value = "isPrimary", defaultValue = "false") Boolean isPrimary) {
-        try {
-            Image savedImage = imageService.uploadImageForHotel(hotelId, file, imageName, isPrimary);
-            ImageRequest imageDto = imageService.convertToDto(savedImage);
-            return ResponseEntity.status(HttpStatus.CREATED).body(imageDto);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    // Obtener todas las imágenes de un hotel
-    @GetMapping("/hotels/{hotelId}")
-    public ResponseEntity<List<ImageRequest>> getImagesByHotelId(@PathVariable UUID hotelId) {
-        List<ImageRequest> images = imageService.getImagesByHotelId(hotelId);
-        return ResponseEntity.ok(images);
-    }
-
-    // Obtener la imagen principal de un hotel
-    @GetMapping("/hotels/{hotelId}/primary")
-    public ResponseEntity<ImageRequest> getPrimaryImageByHotelId(@PathVariable UUID hotelId) {
-        ImageRequest primaryImage = imageService.getPrimaryImageByHotelId(hotelId);
-        if (primaryImage != null) {
-            return ResponseEntity.ok(primaryImage);
-        }
-        return ResponseEntity.notFound().build();
-    }
-
-    // === ENDPOINTS PARA HABITACIONES ===
-    
-    // Subir imagen para una habitación
-    @PostMapping("/rooms/{roomId}")
-    public ResponseEntity<ImageRequest> uploadImageForRoom(
-            @PathVariable UUID roomId,
-            @RequestParam("file") MultipartFile file,
-            @RequestParam(value = "imageName", required = false) String imageName,
-            @RequestParam(value = "isPrimary", defaultValue = "false") Boolean isPrimary) {
-        try {
-            Image savedImage = imageService.uploadImageForRoom(roomId, file, imageName, isPrimary);
-            ImageRequest imageDto = imageService.convertToDto(savedImage);
-            return ResponseEntity.status(HttpStatus.CREATED).body(imageDto);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    // Obtener todas las imágenes de una habitación
-    @GetMapping("/rooms/{roomId}")
-    public ResponseEntity<List<ImageRequest>> getImagesByRoomId(@PathVariable UUID roomId) {
-        List<ImageRequest> images = imageService.getImagesByRoomId(roomId);
-        return ResponseEntity.ok(images);
-    }
-
-    // Obtener la imagen principal de una habitación
-    @GetMapping("/rooms/{roomId}/primary")
-    public ResponseEntity<ImageRequest> getPrimaryImageByRoomId(@PathVariable UUID roomId) {
-        ImageRequest primaryImage = imageService.getPrimaryImageByRoomId(roomId);
-        if (primaryImage != null) {
-            return ResponseEntity.ok(primaryImage);
-        }
-        return ResponseEntity.notFound().build();
-    }
-
-    // === ENDPOINTS GENERALES ===
+    // === ENDPOINTS GENERALES PARA IMÁGENES ===
     
     // Establecer imagen como principal
     @PutMapping("/{imageId}/set-primary")
@@ -169,22 +91,13 @@ public class ImagesController {
         }
     }
 
-    // Obtener todas las imágenes
+    // Obtener todas las imágenes (admin endpoint)
     @GetMapping
-    public ResponseEntity<List<ImageRequest>> getAllImages() {
+    public ResponseEntity<List<ImageResponse>> getAllImages() {
         List<Image> images = imageService.getAllImages();
-        List<ImageRequest> imageDtos = images.stream()
-                .map(imageService::convertToDto)
+        List<ImageResponse> imageResponses = images.stream()
+                .map(imageService::convertToResponse)
                 .toList();
-        return ResponseEntity.ok(imageDtos);
-    }
-
-    // Método legacy para compatibilidad
-    @PostMapping
-    public String addImagePost(AddFileRequest request) throws IOException, SerialException, SQLException {
-        byte[] bytes = request.getFile().getBytes();
-        Blob blob = new javax.sql.rowset.serial.SerialBlob(bytes);
-        imageService.create(Image.builder().image(blob).build());
-        return "created";
+        return ResponseEntity.ok(imageResponses);
     }
 }
