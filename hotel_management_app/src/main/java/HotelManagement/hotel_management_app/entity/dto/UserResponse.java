@@ -37,5 +37,4 @@ public class UserResponse {
     private String nationality;
     private LocalDate birthDate;
     
-    // ELIMINADOS: métodos helper redundantes (el role ya indica el tipo)
 }

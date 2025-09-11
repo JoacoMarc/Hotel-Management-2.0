@@ -35,7 +35,7 @@ public class Hotel {
     @Column(name = "rating", nullable = false)
     private int rating;
 
-    @Column(name = "Country", nullable = false)
+    @Column(name = "country", nullable = false)
     private String country;
     
     @Column(name = "City", nullable = false)
@@ -52,16 +52,21 @@ public class Hotel {
 
     // Relaciones bidireccionales
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, fetch = FetchType.LAZY )
-    @JsonIgnore // Evitar bucle infinito en JSON
+    @JsonIgnore 
     private List<Room> rooms;
 
     @OneToMany(mappedBy = "hotel", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
-    @JsonIgnore // Evitar bucle infinito en JSON
+    @JsonIgnore 
     private List<Booking> bookings;
 
     @OneToMany(mappedBy = "hotel", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
-    @JsonIgnore // Evitar bucle infinito en JSON
+    @JsonIgnore 
     private List<User> employees;
+
+    // Relación con imágenes
+    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore // Evitar bucle infinito en JSON
+    private List<Image> images;
 
 }
 

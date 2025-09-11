@@ -19,9 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 import HotelManagement.hotel_management_app.entity.Room;
 import HotelManagement.hotel_management_app.entity.Hotel;
 import HotelManagement.hotel_management_app.entity.dto.RoomRequest;
+import HotelManagement.hotel_management_app.entity.dto.ImageRequest;
 import HotelManagement.hotel_management_app.exceptions.roomExceptions.RoomBelongsToDifferentHotelException;
 import HotelManagement.hotel_management_app.service.Room.RoomService;
 import HotelManagement.hotel_management_app.service.Hotel.HotelService;
+import HotelManagement.hotel_management_app.service.Img.ImageService;
 
 @RestController
 public class RoomController {
@@ -30,6 +32,9 @@ public class RoomController {
     
     @Autowired
     private HotelService hotelService;
+
+    @Autowired
+    private ImageService imageService;
 
     // ===== RUTAS ANIDADAS (Recomendadas para operaciones específicas de hotel) =====
     
@@ -113,5 +118,21 @@ public class RoomController {
             @RequestParam(required = false) String hotelCity,
             @RequestParam(required = false) String hotelCountry) {
         return roomService.searchRooms(type, price, capacity, available, number, hotelId, minPrice, maxPrice, hotelName, hotelCity, hotelCountry);
+    }
+
+    // Métodos para manejo de imágenes de habitaciones
+    @GetMapping("/api/v1/rooms/{roomId}/images")
+    public ResponseEntity<List<ImageRequest>> getRoomImages(@PathVariable UUID roomId) {
+        List<ImageRequest> images = imageService.getImagesByRoomId(roomId);
+        return ResponseEntity.ok(images);
+    }
+
+    @GetMapping("/api/v1/rooms/{roomId}/images/primary")
+    public ResponseEntity<ImageRequest> getRoomPrimaryImage(@PathVariable UUID roomId) {
+        ImageRequest primaryImage = imageService.getPrimaryImageByRoomId(roomId);
+        if (primaryImage != null) {
+            return ResponseEntity.ok(primaryImage);
+        }
+        return ResponseEntity.notFound().build();
     }
 }

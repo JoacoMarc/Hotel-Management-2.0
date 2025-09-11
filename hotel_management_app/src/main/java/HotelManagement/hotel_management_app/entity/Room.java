@@ -1,5 +1,6 @@
 package HotelManagement.hotel_management_app.entity;
 import java.util.UUID;
+import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,7 +9,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.FetchType;
 import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 @Data
@@ -40,5 +44,10 @@ public class Room {
     @JoinColumn(name = "hotel_id", nullable = false)
     @JsonIgnore  // No incluir en respuestas JSON
     private Hotel hotel;
+
+    // Relación con imágenes
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore // Evitar bucle infinito en JSON
+    private List<Image> images;
     
 }

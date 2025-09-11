@@ -128,9 +128,16 @@ public class SecurityConfig {
                 //Employees pueden eliminar reservas de su hotel
                 .requestMatchers("DELETE", "/api/v1/bookings/**").hasAnyAuthority(UserRole.ADMIN.name(), UserRole.HOTEL_MANAGER.name(), UserRole.FRONT_DESK_MANAGER.name(), UserRole.RECEPTIONIST.name(), UserRole.HOUSEKEEPING_MANAGER.name(), UserRole.HOUSEKEEPER.name())
 
-            
-
-                
+                // Gestión de imágenes
+                // Endpoints de consulta (GET) - Solo ADMIN, HOTEL_MANAGER 
+                .requestMatchers("GET", "/api/v1/images/**").hasAnyAuthority(UserRole.ADMIN.name(), UserRole.HOTEL_MANAGER.name())
+                // Subida de imágenes - Solo ADMIN y HOTEL_MANAGER
+                .requestMatchers("POST", "/api/v1/images/hotels/**").hasAnyAuthority(UserRole.ADMIN.name(), UserRole.HOTEL_MANAGER.name())
+                .requestMatchers("POST", "/api/v1/images/rooms/**").hasAnyAuthority(UserRole.ADMIN.name(), UserRole.HOTEL_MANAGER.name())
+                // Actualización de imágenes (establecer como principal) - Solo ADMIN y HOTEL_MANAGER
+                .requestMatchers("PUT", "/api/v1/images/**").hasAnyAuthority(UserRole.ADMIN.name(), UserRole.HOTEL_MANAGER.name())
+                // Eliminación de imágenes - Solo ADMIN y HOTEL_MANAGER
+                .requestMatchers("DELETE", "/api/v1/images/**").hasAnyAuthority(UserRole.ADMIN.name(), UserRole.HOTEL_MANAGER.name())
 
                 .anyRequest().authenticated())
             .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))

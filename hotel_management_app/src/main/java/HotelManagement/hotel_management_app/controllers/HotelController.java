@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import HotelManagement.hotel_management_app.entity.Hotel;
+import HotelManagement.hotel_management_app.entity.dto.ImageRequest;
 import HotelManagement.hotel_management_app.service.Hotel.HotelService;
+import HotelManagement.hotel_management_app.service.Img.ImageService;
 
 
 @RestController
@@ -24,6 +26,9 @@ import HotelManagement.hotel_management_app.service.Hotel.HotelService;
 public class HotelController {
     @Autowired
     private HotelService hotelService;
+
+    @Autowired
+    private ImageService imageService;
 
     @GetMapping
     public List<Hotel> getAllHotels() {
@@ -66,5 +71,21 @@ public class HotelController {
             @RequestParam(required = false) String phone,
             @RequestParam(required = false) String email) {
         return hotelService.searchHotels(country, city, state, type, name, minRating, maxRating, zipCode, phone, email);
+    }
+
+    // Métodos para manejo de imágenes de hoteles
+    @GetMapping("/{hotelId}/images")
+    public ResponseEntity<List<ImageRequest>> getHotelImages(@PathVariable UUID hotelId) {
+        List<ImageRequest> images = imageService.getImagesByHotelId(hotelId);
+        return ResponseEntity.ok(images);
+    }
+
+    @GetMapping("/{hotelId}/images/primary")
+    public ResponseEntity<ImageRequest> getHotelPrimaryImage(@PathVariable UUID hotelId) {
+        ImageRequest primaryImage = imageService.getPrimaryImageByHotelId(hotelId);
+        if (primaryImage != null) {
+            return ResponseEntity.ok(primaryImage);
+        }
+        return ResponseEntity.notFound().build();
     }
 }
