@@ -1,0 +1,24 @@
+spring.application.name=hotel_management_app
+
+# PostgreSQL Database Configuration
+spring.datasource.url=jdbc:postgresql://your-host:5432/your-database
+spring.datasource.username=your-username
+spring.datasource.password=your-password
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+# JPA/Hibernate Configuration  
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+# Connection Pool Configuration 
+spring.datasource.hikari.maximum-pool-size=5
+spring.datasource.hikari.minimum-idle=2
+spring.datasource.hikari.connection-timeout=20000
+spring.datasource.hikari.idle-timeout=300000
+spring.datasource.hikari.max-lifetime=600000
+
+# JWT Configuration
+application.security.jwt.secretKey=your-secret-key-here
+application.security.jwt.expiration=86400000
