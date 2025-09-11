@@ -19,11 +19,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import HotelManagement.hotel_management_app.entity.Hotel;
 import HotelManagement.hotel_management_app.entity.Image;
-import HotelManagement.hotel_management_app.entity.Image;
+import HotelManagement.hotel_management_app.entity.dto.hotelDTO.HotelRequest;
 import HotelManagement.hotel_management_app.entity.dto.hotelDTO.HotelResponse;
 import HotelManagement.hotel_management_app.entity.dto.imgDTO.ImageResponse;
 import HotelManagement.hotel_management_app.service.hotel.HotelService;
+import HotelManagement.hotel_management_app.service.hotel.HotelMapper;
 import HotelManagement.hotel_management_app.service.Img.ImageService;
+
+import jakarta.validation.Valid;
 
 
 @RestController
@@ -34,6 +37,9 @@ public class HotelController {
 
     @Autowired
     private ImageService imageService;
+    
+    @Autowired
+    private HotelMapper hotelMapper;
 
     @GetMapping
     public List<HotelResponse> getAllHotels() {
@@ -47,13 +53,18 @@ public class HotelController {
     }
 
     @PostMapping
-    public Hotel createHotel(@RequestBody Hotel hotel) {
-        return hotelService.createHotel(hotel);
+    public HotelResponse createHotel(@Valid @RequestBody HotelRequest hotelRequest) {
+        Hotel hotel = hotelMapper.toEntity(hotelRequest);
+        Hotel createdHotel = hotelService.createHotel(hotel);
+        return hotelMapper.toResponse(createdHotel);
     }
 
     @PutMapping("/{hotelId}")
-    public Hotel updateHotel(@PathVariable UUID hotelId, @RequestBody Hotel hotel) {
-        return hotelService.updateHotel(hotelId, hotel);
+    public HotelResponse updateHotel(@PathVariable UUID hotelId, @Valid @RequestBody HotelRequest hotelRequest) {
+        Hotel existingHotel = hotelService.getHotelById(hotelId);
+        hotelMapper.updateEntity(existingHotel, hotelRequest);
+        Hotel updatedHotel = hotelService.updateHotel(hotelId, existingHotel);
+        return hotelMapper.toResponse(updatedHotel);
     }
 
     @DeleteMapping("/{hotelId}")

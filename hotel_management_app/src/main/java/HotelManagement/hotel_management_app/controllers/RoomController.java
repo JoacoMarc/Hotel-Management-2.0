@@ -26,13 +26,15 @@ import HotelManagement.hotel_management_app.entity.dto.imgDTO.ImageResponse;
 import HotelManagement.hotel_management_app.entity.dto.roomDTO.RoomRequest;
 import HotelManagement.hotel_management_app.entity.dto.roomDTO.RoomResponse;
 import HotelManagement.hotel_management_app.exceptions.roomExceptions.RoomBelongsToDifferentHotelException;
-import HotelManagement.hotel_management_app.exceptions.imageExceptions.*;
 import HotelManagement.hotel_management_app.service.room.RoomService;
+import HotelManagement.hotel_management_app.service.room.RoomMapper;
 import HotelManagement.hotel_management_app.service.hotel.HotelService;
 import HotelManagement.hotel_management_app.service.Img.ImageService;
 
-@RestController
+import jakarta.validation.Valid;
 
+@RestController
+@RequestMapping("/api/v1/rooms")
 public class RoomController {
     @Autowired
     private RoomService roomService;
@@ -42,32 +44,30 @@ public class RoomController {
 
     @Autowired
     private ImageService imageService;
+    
+    @Autowired
+    private RoomMapper roomMapper;
 
     // ===== RUTAS ANIDADAS (Recomendadas para operaciones específicas de hotel) =====
     
-    @PostMapping ("/api/v1/hotels/{hotelId}/rooms")
-    public Room createRoomInHotel(@PathVariable UUID hotelId, @RequestBody RoomRequest roomRequest) {
+    @PostMapping("/hotels/{hotelId}/rooms")
+    public RoomResponse createRoomInHotel(@PathVariable UUID hotelId, @Valid @RequestBody RoomRequest roomRequest) {
         // Obtener el hotel real de la base de datos
         Hotel hotel = hotelService.getHotelById(hotelId);
         
-        // Crear la habitación con los datos del request
-        Room room = new Room();
-        room.setRoomNumber(roomRequest.getRoomNumber());
-        room.setRoomType(roomRequest.getRoomType());
-        room.setRoomPrice(roomRequest.getRoomPrice());
-        room.setRoomCapacity(roomRequest.getRoomCapacity());
-        room.setRoomAvailability(roomRequest.isRoomAvailability());
-        room.setHotel(hotel);  // Asignar el hotel REAL
+        // Crear la habitación con los datos del request usando el mapper
+        Room room = roomMapper.toEntity(roomRequest, hotel);
+        Room createdRoom = roomService.createRoom(room);
         
-        return roomService.createRoom(room);
+        return roomService.convertToResponseWithImages(createdRoom);
     }
     
-    @GetMapping ("/api/v1/hotels/{hotelId}/rooms")
+    @GetMapping("/hotels/{hotelId}/rooms")
     public List<RoomResponse> getRoomsByHotel(@PathVariable UUID hotelId) {
         return roomService.getRoomsByHotelIdWithImages(hotelId);
     }
     
-    @GetMapping ("/api/v1/hotels/{hotelId}/rooms/{roomId}")
+    @GetMapping("/hotels/{hotelId}/rooms/{roomId}")
     public RoomResponse getRoomInHotel(@PathVariable UUID hotelId, @PathVariable UUID roomId) {
         Room room = roomService.getRoomById(roomId);
         // Validar que la habitación pertenece al hotel y/o hotel no existe
@@ -77,17 +77,23 @@ public class RoomController {
         return roomService.convertToResponseWithImages(room);
     }
     
-    @PutMapping ("/api/v1/hotels/{hotelId}/rooms/{roomId}")
-    public Room updateRoomInHotel(@PathVariable UUID hotelId, @PathVariable UUID roomId, @RequestBody Room room) {
-        // Asegurar que la habitación sigue perteneciendo al hotel correcto
-        if (room.getHotel() == null) {
-            room.setHotel(new HotelManagement.hotel_management_app.entity.Hotel());
+    @PutMapping("/hotels/{hotelId}/rooms/{roomId}")
+    public RoomResponse updateRoomInHotel(@PathVariable UUID hotelId, @PathVariable UUID roomId, @Valid @RequestBody RoomRequest roomRequest) {
+        Room existingRoom = roomService.getRoomById(roomId);
+        
+        // Validar que la habitación pertenece al hotel
+        if (!existingRoom.getHotel().getId().equals(hotelId)) {
+            throw new RoomBelongsToDifferentHotelException("La habitación no pertenece a este hotel");
         }
-        room.getHotel().setId(hotelId);
-        return roomService.updateRoom(roomId, room);
+        
+        // Actualizar la habitación con los datos del request usando el mapper
+        roomMapper.updateEntity(existingRoom, roomRequest);
+        Room updatedRoom = roomService.updateRoom(roomId, existingRoom);
+        
+        return roomService.convertToResponseWithImages(updatedRoom);
     }
     
-    @DeleteMapping ("/api/v1/hotels/{hotelId}/rooms/{roomId}")
+    @DeleteMapping("/hotels/{hotelId}/rooms/{roomId}")
     public ResponseEntity<Void> deleteRoomFromHotel(@PathVariable UUID hotelId, @PathVariable UUID roomId) {
         Room room = roomService.getRoomById(roomId);
         // Validar que la habitación pertenece al hotel
@@ -100,18 +106,18 @@ public class RoomController {
 
     // ===== RUTAS GLOBALES (Para consultas generales) =====
     
-    @GetMapping ("/api/v1/rooms")
+    @GetMapping
     public List<RoomResponse> getAllRooms() {
         return roomService.getAllRoomsWithImages();
     }
     
-    @GetMapping("/api/v1/rooms/{roomId}")
+    @GetMapping("/{roomId}")
     public RoomResponse getRoomById(@PathVariable UUID roomId) {
         return roomService.getRoomByIdWithImages(roomId);
     }
 
     // Búsqueda con filtros múltiples usando query parameters
-    @GetMapping("/api/v1/rooms/search")
+    @GetMapping("/search")
     public List<RoomResponse> searchRooms(
             @RequestParam(required = false) String type,
             @RequestParam(required = false) Double price,
@@ -175,7 +181,7 @@ public class RoomController {
         return ResponseEntity.status(HttpStatus.CREATED).body(imageDto);
     }
     
-    @PutMapping("/api/v1/rooms/{roomId}/images/{imageId}/set-primary")
+    @PutMapping("/{roomId}/images/{imageId}/set-primary")
     public ResponseEntity<String> setPrimaryImageForRoom(
             @PathVariable UUID roomId,
             @PathVariable UUID imageId) {

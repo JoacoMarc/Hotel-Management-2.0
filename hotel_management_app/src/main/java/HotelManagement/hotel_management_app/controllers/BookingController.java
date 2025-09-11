@@ -19,8 +19,9 @@ import HotelManagement.hotel_management_app.entity.dto.bookingDTO.BookingRequest
 import HotelManagement.hotel_management_app.entity.dto.bookingDTO.BookingResponse;
 import HotelManagement.hotel_management_app.service.booking.BookingService;
 import java.time.LocalDate;
-import java.util.stream.Collectors;
 import HotelManagement.hotel_management_app.service.booking.BookingMapper;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/bookings")
@@ -36,7 +37,7 @@ public class BookingController {
         List<Booking> bookings = bookingService.getAllBookings();
         return bookings.stream()
                 .map(bookingMapper::toBookingResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
     
     @GetMapping("/{bookingId}")
@@ -46,14 +47,16 @@ public class BookingController {
     }
     
     @PostMapping
-    public BookingResponse createBooking(@RequestBody BookingRequest bookingRequest) {
+    public BookingResponse createBooking(@Valid @RequestBody BookingRequest bookingRequest) {
         Booking booking = bookingService.createBookingFromRequest(bookingRequest);
         return bookingMapper.toBookingResponse(booking);
     }
     
     @PutMapping("/{bookingId}")
-    public BookingResponse updateBooking(@PathVariable UUID bookingId, @RequestBody Booking booking) {
-        Booking updatedBooking = bookingService.updateBooking(bookingId, booking);
+    public BookingResponse updateBooking(@PathVariable UUID bookingId, @Valid @RequestBody BookingRequest bookingRequest) {
+        Booking existingBooking = bookingService.getBookingById(bookingId);
+        bookingMapper.updateEntity(existingBooking, bookingRequest);
+        Booking updatedBooking = bookingService.updateBooking(bookingId, existingBooking);
         return bookingMapper.toBookingResponse(updatedBooking);
     }
     
@@ -69,7 +72,7 @@ public class BookingController {
         List<Booking> bookings = bookingService.getBookingsByUserId(userId);
         return bookings.stream()
                 .map(bookingMapper::toBookingResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
     
     @GetMapping("/hotel/{hotelId}")
@@ -77,7 +80,7 @@ public class BookingController {
         List<Booking> bookings = bookingService.getBookingsByHotelId(hotelId);
         return bookings.stream()
                 .map(bookingMapper::toBookingResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
     
     @GetMapping("/room/{roomId}")
@@ -85,7 +88,7 @@ public class BookingController {
         List<Booking> bookings = bookingService.getBookingsByRoomId(roomId);
         return bookings.stream()
                 .map(bookingMapper::toBookingResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
     
     // Búsqueda con filtros múltiples usando query parameters
@@ -108,6 +111,6 @@ public class BookingController {
         guestName, guestDocumentNumber);
         return bookings.stream()
                 .map(bookingMapper::toBookingResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 }

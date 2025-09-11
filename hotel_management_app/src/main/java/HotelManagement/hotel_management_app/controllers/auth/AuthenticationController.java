@@ -10,6 +10,7 @@ import HotelManagement.hotel_management_app.entity.dto.userDTO.EmployeeRegisterR
 import HotelManagement.hotel_management_app.entity.dto.userDTO.GuestRegisterRequest;
 import HotelManagement.hotel_management_app.service.auth.AuthenticationService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -21,19 +22,19 @@ public class AuthenticationController {
 
     @PostMapping("/register/employee")
     public ResponseEntity<AuthenticationResponse> registerEmployee(
-            @RequestBody EmployeeRegisterRequest request) {
+            @Valid @RequestBody EmployeeRegisterRequest request) {
         return ResponseEntity.ok(service.registerEmployee(request));
     }
 
     @PostMapping("/register/guest")
     public ResponseEntity<AuthenticationResponse> registerGuest(
-            @RequestBody GuestRegisterRequest request) {
+            @Valid @RequestBody GuestRegisterRequest request) {
         return ResponseEntity.ok(service.registerGuest(request));
     }
 
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(
-            @RequestBody AuthenticationRequest request) {
+            @Valid @RequestBody AuthenticationRequest request) {
         return ResponseEntity.ok(service.authenticate(request));
     }
 

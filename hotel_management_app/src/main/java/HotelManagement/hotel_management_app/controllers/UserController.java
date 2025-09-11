@@ -16,9 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import HotelManagement.hotel_management_app.entity.User;
 import HotelManagement.hotel_management_app.entity.UserRole;
+import HotelManagement.hotel_management_app.entity.dto.userDTO.UserRequest;
 import HotelManagement.hotel_management_app.entity.dto.userDTO.UserResponse;
 import HotelManagement.hotel_management_app.service.user.UserMapper;
 import HotelManagement.hotel_management_app.service.user.UserService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -66,8 +69,10 @@ public class UserController {
 
     // Actualizar usuario
     @PutMapping("/{userId}")
-    public UserResponse updateUser(@PathVariable UUID userId, @RequestBody User user) {
-        User updatedUser = userService.updateUser(userId, user);
+    public UserResponse updateUser(@PathVariable UUID userId, @Valid @RequestBody UserRequest userRequest) {
+        User existingUser = userService.getUserById(userId);
+        userMapper.updateEntity(existingUser, userRequest);
+        User updatedUser = userService.updateUser(userId, existingUser);
         return userMapper.toUserResponse(updatedUser);
     }
 

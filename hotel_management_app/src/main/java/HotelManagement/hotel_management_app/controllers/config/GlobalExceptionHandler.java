@@ -9,6 +9,11 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+
+import jakarta.validation.ConstraintViolationException;
+import org.springframework.web.context.request.WebRequest;
 
 import HotelManagement.hotel_management_app.exceptions.bookingExceptions.BookingDuplicateException;
 import HotelManagement.hotel_management_app.exceptions.bookingExceptions.BookingNotFoundException;
@@ -286,6 +291,72 @@ public class GlobalExceptionHandler {
             validationErrors.put(error.getField(), error.getDefaultMessage())
         );
         errorResponse.put("validationErrors", validationErrors);
+        
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<Map<String, Object>> handleConstraintViolationException(
+            ConstraintViolationException ex, WebRequest request) {
+        
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("timestamp", LocalDateTime.now());
+        errorResponse.put("status", HttpStatus.BAD_REQUEST.value());
+        errorResponse.put("error", "Violación de Restricciones");
+        errorResponse.put("message", "Los datos no cumplen con las restricciones de validación");
+        errorResponse.put("path", request.getDescription(false).replace("uri=", ""));
+        
+        // Agregar detalles de violaciones
+        Map<String, String> violations = new HashMap<>();
+        ex.getConstraintViolations().forEach(violation -> {
+            String propertyPath = violation.getPropertyPath().toString();
+            String message = violation.getMessage();
+            violations.put(propertyPath, message);
+        });
+        errorResponse.put("violations", violations);
+        
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Map<String, Object>> handleTypeMismatchException(
+            MethodArgumentTypeMismatchException ex, WebRequest request) {
+        
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("timestamp", LocalDateTime.now());
+        errorResponse.put("status", HttpStatus.BAD_REQUEST.value());
+        errorResponse.put("error", "Tipo de Dato Inválido");
+        errorResponse.put("message", String.format("El valor '%s' no es válido para el campo '%s'", 
+                ex.getValue(), ex.getName()));
+        errorResponse.put("path", request.getDescription(false).replace("uri=", ""));
+        
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, Object>> handleHttpMessageNotReadableException(
+            HttpMessageNotReadableException ex, WebRequest request) {
+        
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("timestamp", LocalDateTime.now());
+        errorResponse.put("status", HttpStatus.BAD_REQUEST.value());
+        errorResponse.put("error", "Formato de Datos Inválido");
+        errorResponse.put("message", "El formato de los datos enviados no es válido");
+        errorResponse.put("path", request.getDescription(false).replace("uri=", ""));
+        
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalArgumentException(
+            IllegalArgumentException ex, WebRequest request) {
+        
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("timestamp", LocalDateTime.now());
+        errorResponse.put("status", HttpStatus.BAD_REQUEST.value());
+        errorResponse.put("error", "Argumento Inválido");
+        errorResponse.put("message", ex.getMessage());
+        errorResponse.put("path", request.getDescription(false).replace("uri=", ""));
         
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }

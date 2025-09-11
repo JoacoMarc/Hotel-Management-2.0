@@ -5,12 +5,36 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 import HotelManagement.hotel_management_app.entity.Booking;
+import HotelManagement.hotel_management_app.entity.BookingStatus;
 import HotelManagement.hotel_management_app.entity.Room;
 import HotelManagement.hotel_management_app.entity.User;
+import HotelManagement.hotel_management_app.entity.dto.bookingDTO.BookingRequest;
 import HotelManagement.hotel_management_app.entity.dto.bookingDTO.BookingResponse;
 
 @Component
 public class BookingMapper {
+    
+    public void updateEntity(Booking existing, BookingRequest request) {
+        if (request == null || existing == null) {
+            return;
+        }
+        
+        if (request.getCheckInDate() != null) {
+            existing.setCheckInDate(request.getCheckInDate());
+        }
+        if (request.getCheckOutDate() != null) {
+            existing.setCheckOutDate(request.getCheckOutDate());
+        }
+        if (request.getTotalPrice() != null) {
+            existing.setTotalPrice(request.getTotalPrice());
+        }
+        if (request.getStatus() != null) {
+            existing.setStatus(BookingStatus.valueOf(request.getStatus()));
+        }
+        
+        // Note: userIds, hotelId, and roomIds should be handled separately 
+        // as they require database lookups and business logic validation
+    }
     
     public BookingResponse toBookingResponse(Booking booking) {
         return BookingResponse.builder()
