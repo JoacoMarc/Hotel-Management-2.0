@@ -1,4 +1,4 @@
-package HotelManagement.hotel_management_app.service.auth;
+package HotelManagement.hotel_management_app.service.authService;
 
 import java.time.LocalDate;
 import java.util.UUID;

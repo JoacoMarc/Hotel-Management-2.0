@@ -1,4 +1,4 @@
-package HotelManagement.hotel_management_app.service.Img;
+package HotelManagement.hotel_management_app.service.imgService;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

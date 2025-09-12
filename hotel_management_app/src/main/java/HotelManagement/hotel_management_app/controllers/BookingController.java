@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 import HotelManagement.hotel_management_app.entity.Booking;
 import HotelManagement.hotel_management_app.entity.dto.bookingDTO.BookingRequest;
 import HotelManagement.hotel_management_app.entity.dto.bookingDTO.BookingResponse;
-import HotelManagement.hotel_management_app.service.booking.BookingService;
+import HotelManagement.hotel_management_app.service.bookingService.BookingService;
 import java.time.LocalDate;
-import HotelManagement.hotel_management_app.service.booking.BookingMapper;
+import HotelManagement.hotel_management_app.service.bookingService.BookingMapper;
 
 import jakarta.validation.Valid;
 

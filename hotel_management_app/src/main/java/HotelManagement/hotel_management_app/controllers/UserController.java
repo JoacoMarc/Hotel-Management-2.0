@@ -18,8 +18,8 @@ import HotelManagement.hotel_management_app.entity.User;
 import HotelManagement.hotel_management_app.entity.UserRole;
 import HotelManagement.hotel_management_app.entity.dto.userDTO.UserRequest;
 import HotelManagement.hotel_management_app.entity.dto.userDTO.UserResponse;
-import HotelManagement.hotel_management_app.service.user.UserMapper;
-import HotelManagement.hotel_management_app.service.user.UserService;
+import HotelManagement.hotel_management_app.service.userService.UserMapper;
+import HotelManagement.hotel_management_app.service.userService.UserService;
 
 import jakarta.validation.Valid;
 

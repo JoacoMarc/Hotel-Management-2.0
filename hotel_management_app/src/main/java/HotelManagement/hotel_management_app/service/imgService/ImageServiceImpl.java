@@ -1,4 +1,4 @@
-package HotelManagement.hotel_management_app.service.Img;
+package HotelManagement.hotel_management_app.service.imgService;
 
 import HotelManagement.hotel_management_app.entity.Image;
 import HotelManagement.hotel_management_app.entity.Hotel;

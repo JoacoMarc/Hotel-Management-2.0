@@ -1,4 +1,4 @@
-package HotelManagement.hotel_management_app.service.room;
+package HotelManagement.hotel_management_app.service.roomService;
 
 import java.util.List;
 import java.util.UUID;
@@ -12,9 +12,9 @@ import HotelManagement.hotel_management_app.entity.Hotel;
 import HotelManagement.hotel_management_app.entity.dto.imgDTO.ImageResponse;
 import HotelManagement.hotel_management_app.entity.dto.roomDTO.RoomResponse;
 import HotelManagement.hotel_management_app.repository.RoomRepository;
+import HotelManagement.hotel_management_app.service.imgService.ImageService;
 import HotelManagement.hotel_management_app.repository.HotelRepository;
 import HotelManagement.hotel_management_app.repository.BookingRepository;
-import HotelManagement.hotel_management_app.service.Img.ImageService;
 import HotelManagement.hotel_management_app.exceptions.hotelExceptions.HotelNotFoundException;
 import HotelManagement.hotel_management_app.exceptions.roomExceptions.RoomDuplicateException;
 import HotelManagement.hotel_management_app.exceptions.roomExceptions.RoomHasActiveBookingsException;

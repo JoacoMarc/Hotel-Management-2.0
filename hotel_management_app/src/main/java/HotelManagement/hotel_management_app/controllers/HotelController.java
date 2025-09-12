@@ -22,10 +22,9 @@ import HotelManagement.hotel_management_app.entity.Image;
 import HotelManagement.hotel_management_app.entity.dto.hotelDTO.HotelRequest;
 import HotelManagement.hotel_management_app.entity.dto.hotelDTO.HotelResponse;
 import HotelManagement.hotel_management_app.entity.dto.imgDTO.ImageResponse;
-import HotelManagement.hotel_management_app.service.hotel.HotelService;
-import HotelManagement.hotel_management_app.service.hotel.HotelMapper;
-import HotelManagement.hotel_management_app.service.Img.ImageService;
-
+import HotelManagement.hotel_management_app.service.hotelService.HotelService;
+import HotelManagement.hotel_management_app.service.imgService.ImageService;
+import HotelManagement.hotel_management_app.service.hotelService.HotelMapper;
 import jakarta.validation.Valid;
 
 

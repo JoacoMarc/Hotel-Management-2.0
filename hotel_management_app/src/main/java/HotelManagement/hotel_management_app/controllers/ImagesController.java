@@ -2,7 +2,7 @@ package HotelManagement.hotel_management_app.controllers;
 
 import HotelManagement.hotel_management_app.entity.Image;
 import HotelManagement.hotel_management_app.entity.dto.imgDTO.ImageResponse;
-import HotelManagement.hotel_management_app.service.Img.ImageService;
+import HotelManagement.hotel_management_app.service.imgService.ImageService;
 
 import org.springframework.web.bind.annotation.RestController;
 

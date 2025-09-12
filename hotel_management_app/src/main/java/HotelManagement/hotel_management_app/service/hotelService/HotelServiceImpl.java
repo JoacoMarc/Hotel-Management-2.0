@@ -1,4 +1,4 @@
-package HotelManagement.hotel_management_app.service.hotel;
+package HotelManagement.hotel_management_app.service.hotelService;
 
 import java.util.List;
 import java.util.UUID;
@@ -14,7 +14,7 @@ import HotelManagement.hotel_management_app.entity.dto.imgDTO.ImageResponse;
 import HotelManagement.hotel_management_app.exceptions.hotelExceptions.HotelDuplicateException;
 import HotelManagement.hotel_management_app.exceptions.hotelExceptions.HotelNotFoundException;
 import HotelManagement.hotel_management_app.repository.HotelRepository;
-import HotelManagement.hotel_management_app.service.Img.ImageService;
+import HotelManagement.hotel_management_app.service.imgService.ImageService;
 
 @Service
 public class HotelServiceImpl implements HotelService {

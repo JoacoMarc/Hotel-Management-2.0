@@ -1,4 +1,4 @@
-package HotelManagement.hotel_management_app.service.booking;
+package HotelManagement.hotel_management_app.service.bookingService;
 
 import java.time.LocalDate;
 import java.util.List;

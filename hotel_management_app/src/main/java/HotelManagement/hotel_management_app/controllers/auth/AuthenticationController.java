@@ -8,8 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import HotelManagement.hotel_management_app.entity.dto.userDTO.EmployeeRegisterRequest;
 import HotelManagement.hotel_management_app.entity.dto.userDTO.GuestRegisterRequest;
-import HotelManagement.hotel_management_app.service.auth.AuthenticationService;
-
+import HotelManagement.hotel_management_app.service.authService.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 

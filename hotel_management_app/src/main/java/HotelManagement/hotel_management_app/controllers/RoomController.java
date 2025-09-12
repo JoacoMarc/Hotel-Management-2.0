@@ -26,11 +26,10 @@ import HotelManagement.hotel_management_app.entity.dto.imgDTO.ImageResponse;
 import HotelManagement.hotel_management_app.entity.dto.roomDTO.RoomRequest;
 import HotelManagement.hotel_management_app.entity.dto.roomDTO.RoomResponse;
 import HotelManagement.hotel_management_app.exceptions.roomExceptions.RoomBelongsToDifferentHotelException;
-import HotelManagement.hotel_management_app.service.room.RoomService;
-import HotelManagement.hotel_management_app.service.room.RoomMapper;
-import HotelManagement.hotel_management_app.service.hotel.HotelService;
-import HotelManagement.hotel_management_app.service.Img.ImageService;
-
+import HotelManagement.hotel_management_app.service.roomService.RoomService;
+import HotelManagement.hotel_management_app.service.roomService.RoomMapper;
+import HotelManagement.hotel_management_app.service.hotelService.HotelService;
+import HotelManagement.hotel_management_app.service.imgService.ImageService;
 import jakarta.validation.Valid;
 
 @RestController
